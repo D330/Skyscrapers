@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Appcompat -->
+    <color name="colorAccent">#81179C</color>
+    <color name="colorPrimary">#81179C</color>
+    <color name="colorPrimaryDark">#621176</color>
+
+    <!-- Content -->
+    <color name="content_background">#f7f7f7</color>
+
+    <!-- Navigation drawer -->
+    <color name="drawer_header_background">#202020</color>
+    <color name="drawer_header_balance_coins">#e2a60f</color>
+    <color name="drawer_header_balance_dollars">#23b328</color>
+    <color name="drawer_header_level">#ffffff</color>
+    <color name="drawer_header_nick">#ffffff</color>
+    <color name="drawer_navigation_item_selected">#81179C</color>
+    <color name="drawer_navigation_item_disabled">#000000</color>
+    <color name="drawer_footer_background">#1e1e1e</color>
+    <color name="drawer_footer_text">#8e8e8e</color>
+    <color name="drawer_footer_text_pressed">#ffffff</color>
+
+    <!-- User level -->
+    <color name="level_1_man">#1f68c1</color>
+    <color name="level_1_woman">#ea10bf</color>
+    <color name="level_30">#23b328</color>
+    <color name="level_40">#e2a60f</color>
+    <color name="level_50">#ffffff</color>
+    <color name="level_60">#81179C</color>
+    <color name="level_70">#cc231a</color>
+
+</resources>

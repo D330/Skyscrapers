@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Skyscrapers</string>
+
+    <!-- Navigation drawer -->
+    <string name="drawer_header_level" formatted="false">%d ур. (%d%%)</string>
+    <string name="drawer_item_profile">Мой профиль</string>
+    <string name="drawer_item_city">Мой город</string>
+    <string name="drawer_item_messages">Сообщения</string>
+    <string name="drawer_item_friends">Друзья</string>
+    <string name="drawer_item_quests">Задания</string>
+    <string name="drawer_item_shop">Магазин</string>
+    <string name="drawer_item_rating">Рейтинг</string>
+    <string name="drawer_item_forum">Форум</string>
+    <string name="drawer_item_chat">Чат</string>
+    <string name="drawer_item_settings">Настройки</string>
+    <string name="drawer_item_exit">Выход</string>
+    <string name="drawer_footer_online" formatted="false">Онлайн: %d</string>
+    <string name="drawer_footer_time" formatted="false">%d:%d</string>
+    <string name="drawer_footer_more_games">Ещё игры&#8230;</string>
+    <string name="drawer_footer_app_version" formatted="false">v%s</string>
+
+</resources>

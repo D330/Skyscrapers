@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/drawer_header_background"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/drawer_header_padding"
+    android:paddingTop="@dimen/drawer_header_top_padding"
+    android:paddingRight="@dimen/drawer_header_padding"
+    android:paddingBottom="@dimen/drawer_header_padding">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/drawer_header_balance_coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/drawer_header_balance_coins"
+            android:textSize="@dimen/drawer_header_balance"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/drawer_header_balance_dollars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/drawer_header_balance_dollars"
+            android:textSize="@dimen/drawer_header_balance"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <ru.flippy.skyscrapers.application.ui.view.CircleUserView
+            android:id="@+id/drawer_header_user_icon"
+            android:layout_width="@dimen/circle_user_large"
+            android:layout_height="@dimen/circle_user_large" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/drawer_header_padding"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/drawer_header_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/drawer_header_level" />
+
+            <ProgressBar
+                android:id="@+id/drawer_header_level_progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="false" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/drawer_header_nick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/drawer_header_padding"
+        android:textColor="@color/drawer_header_nick"
+        android:textSize="@dimen/drawer_header_nick" />
+
+
+</LinearLayout>

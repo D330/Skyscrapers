@@ -1,0 +1,17 @@
+<resources>
+
+    <!-- Navigation drawer -->
+    <dimen name="drawer_header_padding">16dp</dimen>
+    <dimen name="drawer_header_top_padding">32dp</dimen>
+    <dimen name="drawer_header_balance">16sp</dimen>
+    <dimen name="drawer_header_level">17sp</dimen>
+    <dimen name="drawer_header_nick">20sp</dimen>
+    <dimen name="drawer_footer_padding">16dp</dimen>
+    <dimen name="drawer_footer_divider_margin">40dp</dimen>
+    <dimen name="drawer_footer_text">13sp</dimen>
+
+    <!-- Circle user -->
+    <dimen name="circle_user_large">64dp</dimen>
+
+
+</resources>
