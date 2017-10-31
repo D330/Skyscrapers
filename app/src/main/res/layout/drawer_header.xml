@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
 
-        <ru.flippy.skyscrapers.application.ui.view.CircleUserView
+        <ru.flippy.skyscrapers.application.view.CircleUserView
             android:id="@+id/drawer_header_user_icon"
             android:layout_width="@dimen/circle_user_large"
             android:layout_height="@dimen/circle_user_large" />

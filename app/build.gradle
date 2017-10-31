@@ -20,10 +20,11 @@ android {
 }
 
 dependencies {
-    compile 'com.amitshekhar.android:android-networking:1.0.0'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'org.jsoup:jsoup:1.10.3'
     compile('com.mikepenz:materialdrawer:5.9.5@aar') { transitive = true; }
     compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }
 
 configurations.all {
