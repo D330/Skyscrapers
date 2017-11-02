@@ -2,10 +2,11 @@ package ru.flippy.skyscrapers.application.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -14,12 +15,9 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import butterknife.BindString;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import ru.flippy.skyscrapers.BuildConfig;
 import ru.flippy.skyscrapers.R;
-import ru.flippy.skyscrapers.api.models.TotalData;
+import ru.flippy.skyscrapers.sdk.api.model.TotalData;
 
 public class NavigationDrawer {
 
@@ -133,16 +131,22 @@ public class NavigationDrawer {
             @Override
             public void onClick(View v) {
                 close();
-                drawerListener.onFooterMoreGamesClick();
+                openURL("http://overmobile.ru/");
             }
         });
         footer.findViewById(R.id.drawer_footer_overmobile_logo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 close();
-                drawerListener.onFooterOverMobileClick();
+                openURL("http://igrotop.mobi/");
             }
         });
+    }
+
+    private void openURL(String url) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        context.startActivity(i);
     }
 
     public void updateData(@NonNull TotalData totalData) {
@@ -175,9 +179,5 @@ public class NavigationDrawer {
         void onNavigationItemClick(int id, String title);
 
         void onFooterOnlineClick();
-
-        void onFooterMoreGamesClick();
-
-        void onFooterOverMobileClick();
     }
 }

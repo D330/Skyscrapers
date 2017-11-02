@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.flippy.skyscrapers.R;
-import ru.flippy.skyscrapers.api.models.User;
+import ru.flippy.skyscrapers.sdk.api.model.User;
 
 public class CircleUserView extends FrameLayout {
 

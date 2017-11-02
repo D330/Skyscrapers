@@ -12,7 +12,7 @@ import butterknife.ButterKnife;
 import ru.flippy.skyscrapers.R;
 import ru.flippy.skyscrapers.application.view.NavigationDrawer;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements NavigationDrawer.OnDrawerListener {
 
     private NavigationDrawer drawer;
 
@@ -27,38 +27,22 @@ public class GameActivity extends AppCompatActivity {
         ViewCompat.setElevation(toolbar, 10f);
         setSupportActionBar(toolbar);
         drawer = new NavigationDrawer(this);
-        drawer.setOnDrawerListener(new NavigationDrawer.OnDrawerListener() {
-            @Override
-            public void onHeaderClick() {
+        drawer.setOnDrawerListener(this);
+    }
 
-            }
+    @Override
+    public void onHeaderClick() {
 
-            @Override
-            public void onNavigationItemClick(int id, String title) {
+    }
 
-            }
+    @Override
+    public void onNavigationItemClick(int id, String title) {
 
-            @Override
-            public void onFooterOnlineClick() {
+    }
 
-            }
+    @Override
+    public void onFooterOnlineClick() {
 
-            @Override
-            public void onFooterMoreGamesClick() {
-                openURL("http://igrotop.mobi/");
-            }
-
-            @Override
-            public void onFooterOverMobileClick() {
-                openURL("http://overmobile.ru/");
-            }
-
-            private void openURL(String url) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });
     }
 
     @Override
