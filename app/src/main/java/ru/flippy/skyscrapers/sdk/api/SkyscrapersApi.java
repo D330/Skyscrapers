@@ -1,13 +1,13 @@
 package ru.flippy.skyscrapers.sdk.api;
 
-import ru.flippy.skyscrapers.sdk.api.methods.LoginRequest;
-import ru.flippy.skyscrapers.sdk.api.methods.ProfileRequest;
-import ru.flippy.skyscrapers.sdk.api.methods.blacklist.SkyscrapersBlackList;
-import ru.flippy.skyscrapers.sdk.api.methods.chat.SkyscrapersChat;
-import ru.flippy.skyscrapers.sdk.api.methods.city.SkyscrapersCity;
-import ru.flippy.skyscrapers.sdk.api.methods.friends.SkyscrapersFriends;
-import ru.flippy.skyscrapers.sdk.api.methods.mail.SkyscrapersMail;
-import ru.flippy.skyscrapers.sdk.api.methods.settings.SkyscrapersSettings;
+import ru.flippy.skyscrapers.sdk.api.request.LoginRequest;
+import ru.flippy.skyscrapers.sdk.api.request.ProfileRequest;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersBlackList;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersChat;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersCity;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersFriends;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersMail;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersSettings;
 
 public class SkyscrapersApi {
 

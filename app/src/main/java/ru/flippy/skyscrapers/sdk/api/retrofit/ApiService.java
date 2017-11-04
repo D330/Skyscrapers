@@ -53,6 +53,12 @@ public interface ApiService {
     @GET("tower/id/{userId}/¿wicket:interface=:{wicket}:guildInviteLink::ILinkListener::")
     Call<Page> cityInvite(@Path("wicket") long wicket, @Path("userId") long userId);
 
+    @GET("city/role/0/{userId}")
+    Call<Page> cityChangeRolePage(@Path("userId") long userId);
+
+    @GET("city/role/0/{userId}/¿wicket:interface=:{wicket}:role{level}Link::ILinkListener::")
+    Call<Page> cityChangeRole(@Path("wicket") long wicket, @Path("userId") long userId, @Path("level") int level);
+
     @GET("city/about/0/{cityId}")
     Call<Page> citySettings(@Path("cityId") long cityId);
 

@@ -2,9 +2,6 @@ package ru.flippy.skyscrapers.sdk.api.helper;
 
 import org.jsoup.nodes.Element;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class Parser {
@@ -17,7 +14,7 @@ public class Parser {
 
     private Element element;
 
-    public static Parser from(Element element){
+    public static Parser from(Element element) {
         Parser parser = new Parser();
         parser.element = element;
         return parser;
@@ -50,15 +47,17 @@ public class Parser {
     }
 
     public boolean checkPageError() {
-        return false;
+        return !element.select("div[class=m5 cntr amount]:contains(Произошла какая-то ошибка), div[class=m5 cntr amount]:contains(Данная страница недоступна)").isEmpty();
     }
 
     public long getWicket() {
         Element wicketElement = element.select("form[action*=wicket], a[href*=wicket]").first();
         String url = wicketElement.hasAttr("href") ? wicketElement.attr("href") : wicketElement.attr("action");
-        Matcher wicketMatcher = Pattern.compile(":(\\d+):").matcher(url);
-        if (wicketMatcher.matches()) {
-            return Long.parseLong(wicketMatcher.group(1));
+        String[] splitUrl = url.split(":");
+        for (int i = 0; i < splitUrl.length; i++) {
+            if (splitUrl[i].contains("interface")) {
+                return Long.parseLong(splitUrl[i + 1]);
+            }
         }
         return 0;
     }

@@ -1,5 +1,7 @@
 package ru.flippy.skyscrapers.sdk.api.retrofit;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 
@@ -13,6 +15,7 @@ public class QuestionMarkInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request original = chain.request();
         String originalUrl = original.url().toString();
+        Log.d("INTERCEPTOR", originalUrl.replace(URLEncoder.encode("¿", "UTF-8"), "?"));
         Request request = original.newBuilder()
                 .method(original.method(), original.body())
                 .url(originalUrl.replace(URLEncoder.encode("¿", "UTF-8"), "?"))

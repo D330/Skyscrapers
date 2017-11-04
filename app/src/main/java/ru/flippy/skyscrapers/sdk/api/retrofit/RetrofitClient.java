@@ -11,6 +11,7 @@ public class RetrofitClient {
     public static void initialize() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new QuestionMarkInterceptor())
+                .cookieJar(new CookieStore())
                 .build();
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
@@ -20,7 +21,7 @@ public class RetrofitClient {
         api = retrofit.create(ApiService.class);
     }
 
-    public static Retrofit getClient(){
+    public static Retrofit getClient() {
         return retrofit;
     }
 
