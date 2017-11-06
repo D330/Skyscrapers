@@ -1,13 +1,14 @@
 package ru.flippy.skyscrapers.sdk.api;
 
-import ru.flippy.skyscrapers.sdk.api.request.LoginRequest;
-import ru.flippy.skyscrapers.sdk.api.request.ProfileRequest;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersBlackList;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersChat;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersCity;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersFriends;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersMail;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersPayment;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersSettings;
+import ru.flippy.skyscrapers.sdk.api.request.LoginRequest;
+import ru.flippy.skyscrapers.sdk.api.request.ProfileRequest;
 
 public class SkyscrapersApi {
 
@@ -37,6 +38,10 @@ public class SkyscrapersApi {
 
     public static SkyscrapersMail mail() {
         return new SkyscrapersMail();
+    }
+
+    public static SkyscrapersPayment payment() {
+        return new SkyscrapersPayment();
     }
 
     public static SkyscrapersSettings settings() {

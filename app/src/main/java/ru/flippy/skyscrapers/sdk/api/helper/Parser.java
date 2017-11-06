@@ -52,11 +52,13 @@ public class Parser {
 
     public long getWicket() {
         Element wicketElement = element.select("form[action*=wicket], a[href*=wicket]").first();
-        String url = wicketElement.hasAttr("href") ? wicketElement.attr("href") : wicketElement.attr("action");
-        String[] splitUrl = url.split(":");
-        for (int i = 0; i < splitUrl.length; i++) {
-            if (splitUrl[i].contains("interface")) {
-                return Long.parseLong(splitUrl[i + 1]);
+        if (wicketElement != null) {
+            String url = wicketElement.hasAttr("href") ? wicketElement.attr("href") : wicketElement.attr("action");
+            String[] splitUrl = url.split(":");
+            for (int i = 0; i < splitUrl.length; i++) {
+                if (splitUrl[i].contains("interface")) {
+                    return Long.parseLong(splitUrl[i + 1]);
+                }
             }
         }
         return 0;

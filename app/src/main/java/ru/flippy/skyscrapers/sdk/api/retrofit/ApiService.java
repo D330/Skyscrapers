@@ -111,6 +111,19 @@ public interface ApiService {
     @GET("mail/read/id/{dialogId}/page/{page}")
     Call<Page> mailDialogHistoryPagination(@Path("dialogId") long dialogId, @Path("page") int page);
 
+    @GET("¿wicket:interface=:{wicket}:xMobilePayment:mobilePhonePanel:changePhoneBlock:changeLink::ILinkListener::")
+    Call<Page> paymentChangePhonePage(@Path("wicket") long wicket);
+
+    @FormUrlEncoded
+    @POST("¿wicket:interface=:{wicket}:xMobilePayment:mobilePhonePanel:emptyPhoneBlock:phoneForm::IFormSubmitListener::")
+    Call<Page> paymentChangePhone(@Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
+
+    @GET("payment/type/{type}")
+    Call<Page> paymentDonatePage(@Path(encoded = true, value = "type") String type);
+
+    @GET("¿wicket:interface=:{wicket}:{type}:paymentChoosePanel:link{donateId}::ILinkListener::")
+    Call<Page> paymentDonate(@Path("wicket") long wicket, @Path("type") String type, @Path("donateId") long donateId);
+
     @GET("settings")
     Call<Page> settings();
 

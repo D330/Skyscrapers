@@ -5,27 +5,23 @@ import retrofit2.Retrofit;
 
 public class RetrofitClient {
 
-    private static Retrofit retrofit;
-    private static ApiService api;
+    private static ApiService skyscrapersApi;
 
     public static void initialize() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(new QuestionMarkInterceptor())
                 .cookieJar(new CookieStore())
                 .build();
-        retrofit = new Retrofit.Builder()
+        Retrofit skyscrapersClient = new Retrofit.Builder()
                 .client(okHttpClient)
                 .addConverterFactory(new PageConverterFactory())
                 .baseUrl(ApiService.ENDPOINT)
                 .build();
-        api = retrofit.create(ApiService.class);
+        skyscrapersApi = skyscrapersClient.create(ApiService.class);
     }
 
-    public static Retrofit getClient() {
-        return retrofit;
-    }
 
     public static ApiService getApi() {
-        return api;
+        return skyscrapersApi;
     }
 }

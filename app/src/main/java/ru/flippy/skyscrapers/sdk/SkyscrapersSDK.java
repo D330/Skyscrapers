@@ -14,7 +14,10 @@ public class SkyscrapersSDK {
 
     private static SharedPreferences prefs;
 
-    public static void initialize(Context context) {
+    public static Context context;
+
+    public static void initialize(Context applicationContext) {
+        context = applicationContext;
         RetrofitClient.initialize();
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
