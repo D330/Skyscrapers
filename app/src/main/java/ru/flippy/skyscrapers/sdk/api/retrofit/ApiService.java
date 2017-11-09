@@ -3,6 +3,7 @@ package ru.flippy.skyscrapers.sdk.api.retrofit;
 import java.util.HashMap;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -69,6 +70,19 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("city/about/0/{cityId}/¿wicket:interface=:{wicket}:guildNameForm::IFormSubmitListener::")
     Call<Page> citySettingsChangeName(@Path("wicket") long wicket, @Path("cityId") long cityId, @FieldMap HashMap<String, String> postData);
+
+    @GET("forum/list")
+    Call<Page> forumSections();
+
+    @GET("forum/0/{sectionId}/page/{page}")
+    Call<Page> forumTopics(@Path("sectionId") long sectionId, @Path("page") int page);
+
+    @GET("forum/topic/id/{topicId}/page/{page}")
+    Call<Page> forumTopic(@Path("topicId") long topicId, @Path("page") int page);
+
+    @FormUrlEncoded
+    @POST("forum/topic/id/{topicId}/page/{page}/¿wicket:bookmarkablePage=:ru.overmobile.towers.wicket.pages.StaticPostHandler")
+    Call<Page> forumComment(@Path("topicId") long topicId, @Path("page") int page, @FieldMap HashMap<String, String> postData);
 
     @GET("friends")
     Call<Page> friends();

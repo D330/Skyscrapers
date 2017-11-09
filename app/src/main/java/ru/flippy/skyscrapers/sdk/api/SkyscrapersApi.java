@@ -3,6 +3,7 @@ package ru.flippy.skyscrapers.sdk.api;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersBlackList;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersChat;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersCity;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersForum;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersFriends;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersMail;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersPayment;
@@ -30,6 +31,10 @@ public class SkyscrapersApi {
 
     public static SkyscrapersCity city() {
         return new SkyscrapersCity();
+    }
+
+    public static SkyscrapersForum forum() {
+        return new SkyscrapersForum();
     }
 
     public static SkyscrapersFriends friends() {
