@@ -124,6 +124,10 @@ public interface ApiService {
     @GET("¿wicket:interface=:{wicket}:{type}:paymentChoosePanel:link{donateId}::ILinkListener::")
     Call<Page> paymentDonate(@Path("wicket") long wicket, @Path("type") String type, @Path("donateId") long donateId);
 
+    @FormUrlEncoded
+    @POST("payment/type/xWebmoneyInvoice/¿wicket:interface=:{wicket}:xWebmoneyInvoice:wmForm::IFormSubmitListener::")
+    Call<Page> paymentWebmoneyInvoice(@Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
+
     @GET("settings")
     Call<Page> settings();
 

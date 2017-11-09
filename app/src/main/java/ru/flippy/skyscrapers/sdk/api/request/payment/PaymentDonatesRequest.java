@@ -29,7 +29,7 @@ public class PaymentDonatesRequest extends BaseRequest {
         this.type = type;
     }
 
-    public void execute(final RequestListener<Pair<String, List<Donate>>> listener) {
+    public void execute(final RequestListener<Pair<Integer, List<Donate>>> listener) {
         RetrofitClient.getApi().paymentDonatePage(type).enqueue(new Callback<Page>() {
             @Override
             public void onResponse(Call<Page> call, Response<Page> response) {
@@ -41,20 +41,30 @@ public class PaymentDonatesRequest extends BaseRequest {
                     if (FormParser.checkForm(document, "emptyPhoneBlock")) {
                         listener.onError(PHONE_NOT_SPECIFIED);
                     } else {
-                        String phone = null;
-                        if (type.equals(Payment.MOBILE) || type.equals(Payment.QIWI)) {
-                            phone = document.select("div.m5>div>div>div.cntr:contains(+7)>span").first().text();
-                        }
                         List<Donate> donates = new ArrayList<>();
-                        for (Element donateElement : document.select("div.m5>div>div>div:has(a[href*=choosePanel])")) {
-                            Donate donate = new Donate();
-                            donate.setId(Long.parseLong(donateElement.select("a[class=btn btng]").first().attr("href").split(":link")[1].split("::I")[0]));
-                            donate.setPrice(Integer.parseInt(donateElement.select("span[class=minor nshd]").first().text().replaceAll("\\D", "")));
-                            donate.setDollars(Integer.parseInt(donateElement.select("b").first().text().replaceAll("\\D", "")));
-                            donate.setBonus(Integer.parseInt(donateElement.select("span.rc").first().text().replaceAll("\\D", "")));
-                            donates.add(donate);
+                        int number = 0;
+                        if (type.equals(Payment.TERMINALS) || type.equals(Payment.QIWI_TERMINALS)) {
+                            number = Integer.parseInt(document.select("div.m5>div>div.nfl>strong.info").first().text());
+                            for (Element donateElement : document.select("div.cntr>div[class=inbl txtal]>div:has(span.rc)")) {
+                                Donate donate = new Donate();
+                                donate.setDollars(Integer.parseInt(donateElement.select("b").first().text().replaceAll("\\D", "")));
+                                donate.setBonus(Integer.parseInt(donateElement.select("span.rc").first().text().replaceAll("\\D", "")));
+                                donates.add(donate);
+                            }
+                        } else {
+                            if (type.equals(Payment.MOBILE) || type.equals(Payment.QIWI)) {
+                                number = Integer.parseInt(document.select("div.m5>div>div>div.cntr:contains(+7)>span").first().text().replaceAll("\\D", ""));
+                            }
+                            for (Element donateElement : document.select("div.m5>div>div>div:has(a[href*=choosePanel])")) {
+                                Donate donate = new Donate();
+                                donate.setId(Long.parseLong(donateElement.select("a[class=btn btng]").first().attr("href").split(":link")[1].split("::I")[0]));
+                                donate.setPrice(Integer.parseInt(donateElement.select("span[class=minor nshd]").first().text().replaceAll("\\D", "")));
+                                donate.setDollars(Integer.parseInt(donateElement.select("b").first().text().replaceAll("\\D", "")));
+                                donate.setBonus(Integer.parseInt(donateElement.select("span.rc").first().text().replaceAll("\\D", "")));
+                                donates.add(donate);
+                            }
                         }
-                        listener.onResponse(new Pair<>(phone, donates));
+                        listener.onResponse(new Pair<>(number, donates));
                     }
                 }
             }

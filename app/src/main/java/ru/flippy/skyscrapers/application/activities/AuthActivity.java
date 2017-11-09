@@ -4,16 +4,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.Pair;
 
 import java.util.List;
 
 import ru.flippy.skyscrapers.R;
 import ru.flippy.skyscrapers.sdk.api.SkyscrapersApi;
-import ru.flippy.skyscrapers.sdk.api.model.Donate;
 import ru.flippy.skyscrapers.sdk.api.model.Payment;
+import ru.flippy.skyscrapers.sdk.api.model.SmsCountryGroup;
+import ru.flippy.skyscrapers.sdk.api.model.SmsDonate;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
-import ru.flippy.skyscrapers.sdk.listener.RequestListener;
+import ru.flippy.skyscrapers.sdk.listener.PaymentSmsDonatesRequestListener;
 
 public class AuthActivity extends AppCompatActivity {
 
@@ -24,33 +24,29 @@ public class AuthActivity extends AppCompatActivity {
         SkyscrapersApi.login("Query", "zobega900").execute(new ActionRequestListener() {
             @Override
             public void onSuccess() {
-                SkyscrapersApi.payment().donates(Payment.CARD).execute(new RequestListener<Pair<String, List<Donate>>>() {
+                SkyscrapersApi.payment().smsDonates(Payment.SMS).execute(new PaymentSmsDonatesRequestListener() {
                     @Override
-                    public void onResponse(Pair<String, List<Donate>> response) {
-                        Donate donate = response.second.get(0);
-                        SkyscrapersApi.payment().makeDonate(Payment.CARD, donate).execute(new ActionRequestListener() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d("Payment#makeDonate", "success");
+                    public void onResponse(String sms, List<SmsCountryGroup> response) {
+                        Log.d("Payment#smsDonates", "sms: " + sms);
+                        for (SmsCountryGroup smsCountryGroup : response) {
+                            Log.d("Payment#smsDonates", "country: " + smsCountryGroup.getCountry());
+                            for (SmsDonate smsDonate : smsCountryGroup.getDonates()) {
+                                Log.d("Payment#smsDonates", (smsDonate.isApproximately() ? "*" : "") + " " + smsDonate.getPrice() + " " + smsDonate.getCurrency() + " " + (smsDonate.withNds() ? "с ндс" : "") + "\n");
                             }
-
-                            @Override
-                            public void onError(int errorCode) {
-                                Log.d("Payment#makeDonate", "error: " + errorCode);
-                            }
-                        });
+                            Log.d("Payment#smsDonates", "\n\n");
+                        }
                     }
 
                     @Override
                     public void onError(int errorCode) {
-                        Log.d("Payment#donates()", "error: " + errorCode);
+                        Log.d("Payment#smsDonates", "errorCode: " + errorCode);
                     }
                 });
             }
 
             @Override
             public void onError(int errorCode) {
-                Log.d("Login#login()", "error: " + errorCode);
+                Log.d("Login#login", "errorCode: " + errorCode);
             }
         });
     }
