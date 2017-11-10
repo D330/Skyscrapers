@@ -3,7 +3,6 @@ package ru.flippy.skyscrapers.sdk.api.retrofit;
 import java.util.HashMap;
 
 import retrofit2.Call;
-import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -77,12 +76,28 @@ public interface ApiService {
     @GET("forum/0/{sectionId}/page/{page}")
     Call<Page> forumTopics(@Path("sectionId") long sectionId, @Path("page") int page);
 
+    @GET("forum/0/{sectionId}/¿wicket:interface=:{wicket}:markAsReadLink::ILinkListener::")
+    Call<Page> forumMarkAsRead(@Path("sectionId") long sectionId, @Path("wicket") long wicket);
+
     @GET("forum/topic/id/{topicId}/page/{page}")
     Call<Page> forumTopic(@Path("topicId") long topicId, @Path("page") int page);
 
     @FormUrlEncoded
     @POST("forum/topic/id/{topicId}/page/{page}/¿wicket:bookmarkablePage=:ru.overmobile.towers.wicket.pages.StaticPostHandler")
     Call<Page> forumComment(@Path("topicId") long topicId, @Path("page") int page, @FieldMap HashMap<String, String> postData);
+
+    @GET("forum/topic/form/forumId/{sectionId}")
+    Call<Page> forumCreateTopicPage(@Path("sectionId") long sectionId);
+
+    @FormUrlEncoded
+    @POST("forum/topic/form/forumId/{sectionId}/¿wicket:bookmarkablePage=:ru.overmobile.towers.wicket.pages.StaticPostHandler")
+    Call<Page> forumCreateTopic(@Path("sectionId") long sectionId, @FieldMap HashMap<String, String> postData);
+
+    @GET("forum/topic/form/id/{topicId}")
+    Call<Page> forumEditTopicPage(@Path("topicId") long topicId);
+
+    @GET("forum/topic/form/id/{topicId}/¿wicket:bookmarkablePage=:ru.overmobile.towers.wicket.pages.StaticPostHandler")
+    Call<Page> forumEditTopic(@Path("topicId") long topicId, @FieldMap HashMap<String, String> postData);
 
     @GET("friends")
     Call<Page> friends();
