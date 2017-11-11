@@ -14,12 +14,12 @@ public class RetrofitClient {
                 .build();
         Retrofit skyscrapersClient = new Retrofit.Builder()
                 .client(okHttpClient)
-                .addConverterFactory(new PageConverterFactory())
+                .addConverterFactory(new DocumentConverterFactory())
+                .addCallAdapterFactory(new DocumentCallAdapterFactory())
                 .baseUrl(ApiService.ENDPOINT)
                 .build();
         skyscrapersApi = skyscrapersClient.create(ApiService.class);
     }
-
 
     public static ApiService getApi() {
         return skyscrapersApi;

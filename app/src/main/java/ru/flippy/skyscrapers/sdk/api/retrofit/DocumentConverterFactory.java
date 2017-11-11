@@ -10,19 +10,15 @@ import java.lang.reflect.Type;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
-import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.model.Page;
 
-public class PageConverterFactory extends Converter.Factory {
+public class DocumentConverterFactory extends Converter.Factory {
 
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
-        return new Converter<ResponseBody, Page>() {
+        return new Converter<ResponseBody, Document>() {
             @Override
-            public Page convert(ResponseBody response) throws IOException {
-                Document document = Jsoup.parse(response.string());
-                long wicket = Parser.from(document).getWicket();
-                return new Page(document, wicket);
+            public Document convert(ResponseBody response) throws IOException {
+                return Jsoup.parse(response.string());
             }
         };
     }
