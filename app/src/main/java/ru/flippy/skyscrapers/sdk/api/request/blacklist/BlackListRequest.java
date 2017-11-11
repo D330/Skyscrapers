@@ -6,88 +6,43 @@ import org.jsoup.nodes.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.request.BaseRequest;
 import ru.flippy.skyscrapers.sdk.api.model.BlackListUser;
-import ru.flippy.skyscrapers.sdk.api.model.Page;
 import ru.flippy.skyscrapers.sdk.api.model.User;
+import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
-public class BlackListRequest extends BaseRequest {
+public class BlackListRequest {
 
-    public static final int PAGE_NOT_FOUND = 0;
+    private int page;
 
-    private int pageNumber;
-
-    public BlackListRequest(int pageNumber) {
-        this.pageNumber = pageNumber;
+    public BlackListRequest(int page) {
+        this.page = page;
     }
 
     public void execute(final PaginationRequestListener<List<BlackListUser>> listener) {
-        RetrofitClient.getApi().blacklist().enqueue(new Callback<Page>() {
+        RetrofitClient.getApi().blacklist().setErrorPoint(listener).enqueue(new DocumentCallback() {
             @Override
-            public void onResponse(Call<Page> call, Response<Page> response) {
-                Page page = response.body();
-                if (!response.isSuccessful() || page == null) {
-                    listener.onError(UNKNOWN);
+            public void onResponse(Document document, long wicket) {
+                Parser parser = Parser.from(document);
+                if (parser.getPageCount(Parser.TYPE_WICKET) == 1) {
+                    listener.onResponse(parseBlackList(document), 1);
                 } else {
-                    Document document = page.getDocument();
-                    long wicket = page.getWicket();
-                    Parser parser = Parser.from(document);
-                    if (parser.getPageCount(Parser.TYPE_WICKET) == 1) {
-                        listener.onResponse(parseBlackList(document), 1);
-                    } else {
-                        RetrofitClient.getApi().blacklistLastPage(wicket).enqueue(new Callback<Page>() {
-                            @Override
-                            public void onResponse(Call<Page> call, Response<Page> response) {
-                                Page page = response.body();
-                                if (!response.isSuccessful() || page == null) {
-                                    listener.onError(UNKNOWN);
-                                } else {
-                                    Document document = page.getDocument();
-                                    long wicket = page.getWicket();
-                                    final int pageCount = Parser.from(document).getPageCount(Parser.TYPE_WICKET);
-                                    RetrofitClient.getApi().blacklistPagination(wicket, pageNumber).enqueue(new Callback<Page>() {
-                                        @Override
-                                        public void onResponse(Call<Page> call, Response<Page> response) {
-                                            Page page = response.body();
-                                            if (!response.isSuccessful() || page == null) {
-                                                listener.onError(UNKNOWN);
-                                            } else {
-                                                Document document = page.getDocument();
-                                                if (Parser.from(document).checkPageError()) {
-                                                    listener.onError(PAGE_NOT_FOUND);
-                                                } else {
-                                                    listener.onResponse(parseBlackList(document), pageCount);
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<Page> call, Throwable t) {
-                                            listener.onError(NETWORK);
-                                        }
-                                    });
+                    RetrofitClient.getApi().blacklistLastPage(wicket).setErrorPoint(listener).enqueue(new DocumentCallback() {
+                        @Override
+                        public void onResponse(Document document, long wicket) {
+                            final int pageCount = Parser.from(document).getPageCount(Parser.TYPE_WICKET);
+                            RetrofitClient.getApi().blacklistPagination(wicket, pageCount).setErrorPoint(listener).enqueue(new DocumentCallback() {
+                                @Override
+                                public void onResponse(Document document, long wicket) {
+                                    listener.onResponse(parseBlackList(document), pageCount);
                                 }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Page> call, Throwable t) {
-                                listener.onError(NETWORK);
-                            }
-                        });
-                    }
+                            });
+                        }
+                    });
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Page> call, Throwable t) {
-                listener.onError(NETWORK);
             }
         });
     }

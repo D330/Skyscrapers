@@ -1,7 +1,5 @@
 package ru.flippy.skyscrapers.application.activities;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;

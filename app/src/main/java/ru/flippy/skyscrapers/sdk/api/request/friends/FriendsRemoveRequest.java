@@ -1,18 +1,14 @@
 package ru.flippy.skyscrapers.sdk.api.request.friends;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import org.jsoup.nodes.Document;
+
+import ru.flippy.skyscrapers.sdk.api.Error;
 import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.request.BaseRequest;
-import ru.flippy.skyscrapers.sdk.api.model.Page;
+import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
 
-public class FriendsRemoveRequest extends BaseRequest {
-
-    public static final int USER_NOT_FOUND = 0;
-    public static final int NOT_FRIEND_SPECIFIED = 1;
+public class FriendsRemoveRequest {
 
     private long userId;
 
@@ -21,46 +17,24 @@ public class FriendsRemoveRequest extends BaseRequest {
     }
 
     public void execute(final ActionRequestListener listener) {
-        RetrofitClient.getApi().profile(userId).enqueue(new Callback<Page>() {
+        RetrofitClient.getApi().profile(userId).setErrorPoint(listener).enqueue(new DocumentCallback() {
             @Override
-            public void onResponse(Call<Page> call, Response<Page> response) {
-                Page page = response.body();
-                if (!response.isSuccessful() || page == null) {
-                    listener.onError(UNKNOWN);
+            public void onResponse(Document document, long wicket) {
+                Parser parser = Parser.from(document);
+                if (parser.getLink("removeFriendLink") == null) {
+                    listener.onError(Error.ALREADY);
                 } else {
-                    Parser parser = Parser.from(page.getDocument());
-                    if (parser.checkPageError()) {
-                        listener.onError(USER_NOT_FOUND);
-                    } else if (parser.getLink("removeFriendLink") == null) {
-                        listener.onError(NOT_FRIEND_SPECIFIED);
-                    } else {
-                        RetrofitClient.getApi().friendsRemove(userId, page.getWicket()).enqueue(new Callback<Page>() {
-                            @Override
-                            public void onResponse(Call<Page> call, Response<Page> response) {
-                                Page page = response.body();
-                                if (!response.isSuccessful() || page == null) {
-                                    listener.onError(UNKNOWN);
-                                } else {
-                                    if (Parser.from(page.getDocument()).checkFeedBack(Parser.FEEDBACK_INFO, "из друзей")) {
-                                        listener.onSuccess();
-                                    } else {
-                                        listener.onError(UNKNOWN);
-                                    }
-                                }
+                    RetrofitClient.getApi().friendsRemove(userId, wicket).setErrorPoint(listener).enqueue(new DocumentCallback() {
+                        @Override
+                        public void onResponse(Document document, long wicket) {
+                            if (Parser.from(document).checkFeedBack(Parser.FEEDBACK_INFO, "из друзей")) {
+                                listener.onSuccess();
+                            } else {
+                                listener.onError(Error.UNKNOWN);
                             }
-
-                            @Override
-                            public void onFailure(Call<Page> call, Throwable t) {
-                                listener.onError(NETWORK);
-                            }
-                        });
-                    }
+                        }
+                    });
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Page> call, Throwable t) {
-                listener.onError(NETWORK);
             }
         });
     }

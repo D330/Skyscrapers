@@ -18,8 +18,8 @@ public class SkyscrapersSettings {
         return new SettingsChangeAboutRequest(about);
     }
 
-    public SettingsChangeNickRequest changeNick(String newNick, String newNickConfirm) {
-        return new SettingsChangeNickRequest(newNick, newNickConfirm);
+    public SettingsChangeNickRequest changeNick(String nick) {
+        return new SettingsChangeNickRequest(nick);
     }
 
     public SettingsChangeSexRequest changeSex() {
@@ -34,7 +34,7 @@ public class SkyscrapersSettings {
         return new SettingsChangeCityInviteRequest();
     }
 
-    public SettingsChangePasswordRequest changePassword(String oldPassword, String newPassword, String newPasswordConfirm) {
-        return new SettingsChangePasswordRequest(oldPassword, newPassword, newPasswordConfirm);
+    public SettingsChangePasswordRequest changePassword(String oldPassword, String newPassword) {
+        return new SettingsChangePasswordRequest(oldPassword, newPassword);
     }
 }

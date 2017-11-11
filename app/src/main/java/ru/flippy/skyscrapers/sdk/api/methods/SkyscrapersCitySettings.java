@@ -9,7 +9,7 @@ public class SkyscrapersCitySettings {
         return new CitySettingsChangeAboutRequest(about);
     }
 
-    public CitySettingsChangeNameRequest changeName(String name, String nameConfirm){
-        return new CitySettingsChangeNameRequest(name, nameConfirm);
+    public CitySettingsChangeNameRequest changeName(String name) {
+        return new CitySettingsChangeNameRequest(name);
     }
 }

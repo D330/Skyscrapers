@@ -8,23 +8,20 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import ru.flippy.skyscrapers.sdk.api.Error;
 import ru.flippy.skyscrapers.sdk.api.SkyscrapersApi;
 import ru.flippy.skyscrapers.sdk.api.helper.FixedSizeList;
 import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.request.BaseRequest;
 import ru.flippy.skyscrapers.sdk.api.model.Dialog;
 import ru.flippy.skyscrapers.sdk.api.model.MiniMessage;
-import ru.flippy.skyscrapers.sdk.api.model.Page;
 import ru.flippy.skyscrapers.sdk.api.model.Profile;
+import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentTagCallback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
-import ru.flippy.skyscrapers.sdk.api.retrofit.TagCallback;
 import ru.flippy.skyscrapers.sdk.listener.RequestListener;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
-public class MailDialogsRequest extends BaseRequest {
+public class MailDialogsRequest {
 
     private FixedSizeList<Document> pages;
     private LinkedHashMap<Long, MiniMessage> messages;
@@ -32,32 +29,26 @@ public class MailDialogsRequest extends BaseRequest {
     private FixedSizeList<Dialog> dialogs;
 
     public void execute(final RequestListener<List<Dialog>> listener) {
-        RetrofitClient.getApi().mail().enqueue(new Callback<Page>() {
+        RetrofitClient.getApi().mail().setErrorPoint(listener).enqueue(new DocumentCallback() {
             @Override
-            public void onResponse(Call<Page> call, Response<Page> response) {
-                Page page = response.body();
-                if (!response.isSuccessful() || page == null) {
-                    listener.onError(UNKNOWN);
+            public void onResponse(Document document, long wicket) {
+                Element content = document.select("div.m5").first();
+                if (!content.select("div.minor:contains(Почта пустая, писем нет)").isEmpty()) {
+                    listener.onResponse(new ArrayList<Dialog>());
                 } else {
-                    Document document = page.getDocument();
-                    Element content = document.select("div.m5").first();
-                    if (!content.select("div.minor:contains(Почта пустая, писем нет)").isEmpty()) {
-                        listener.onResponse(new ArrayList<Dialog>());
-                    } else {
-                        int pageCount = Parser.from(document).getPageCount(Parser.TYPE_NORMAL);
-                        pages = new FixedSizeList<>(pageCount);
-                        for (int pageNumber = 0; pageNumber < pageCount; pageNumber++) {
-                            TagCallback<Page> callback = new TagCallback<Page>() {
-                                @Override
-                                public void onResponse(Call<Page> call, Response<Page> response) {
-                                    Page page = response.body();
-                                    if (!response.isSuccessful() || page == null) {
-                                        listener.onError(UNKNOWN);
-                                    } else {
-                                        pages.set((int) getTag(), page.getDocument());
+                    int pageCount = Parser.from(document).getPageCount(Parser.TYPE_NORMAL);
+                    pages = new FixedSizeList<>(pageCount);
+                    for (int pageNumber = 0; pageNumber < pageCount; pageNumber++) {
+                        RetrofitClient.getApi().mailPagination(pageNumber)
+                                .setTag(pageCount - pageNumber - 1)
+                                .setErrorPoint(listener)
+                                .enqueue(new DocumentTagCallback() {
+                                    @Override
+                                    public void onResponse(Object tag, Document document, long wicket) {
+                                        pages.set((int) tag, document);
                                         if (pages.isFilled()) {
                                             messages = new LinkedHashMap<>();
-                                            for (Document document : pages) {
+                                            for (Document page : pages) {
                                                 Elements messageElements = document.select("div.m5").first().select("div>div:has(span.tdn>span.user)");
                                                 //сообщения снизу вверх
                                                 for (int i = messageElements.size() - 1; i >= 0; i--) {
@@ -94,29 +85,15 @@ public class MailDialogsRequest extends BaseRequest {
 
                                                     @Override
                                                     public void onError(int errorCode) {
-                                                        listener.onError(NETWORK);
+                                                        listener.onError(Error.NETWORK);
                                                     }
                                                 });
                                             }
                                         }
                                     }
-                                }
-
-                                @Override
-                                public void onFailure(Call<Page> call, Throwable t) {
-                                    listener.onError(NETWORK);
-                                }
-                            };
-                            callback.setTag(pageCount - pageNumber - 1);
-                            RetrofitClient.getApi().mailPagination(pageNumber).enqueue(callback);
-                        }
+                                });
                     }
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Page> call, Throwable t) {
-                listener.onError(NETWORK);
             }
         });
     }

@@ -5,7 +5,7 @@ import ru.flippy.skyscrapers.sdk.api.request.payment.PaymentChangePhoneRequest;
 import ru.flippy.skyscrapers.sdk.api.request.payment.PaymentDonatesRequest;
 import ru.flippy.skyscrapers.sdk.api.request.payment.PaymentMakeDonateRequest;
 import ru.flippy.skyscrapers.sdk.api.request.payment.PaymentSmsDonatesRequest;
-import ru.flippy.skyscrapers.sdk.api.request.payment.PaymentWebmoneyInvoice;
+import ru.flippy.skyscrapers.sdk.api.request.payment.PaymentWebMoneyInvoice;
 
 public class SkyscrapersPayment {
 
@@ -21,8 +21,8 @@ public class SkyscrapersPayment {
         return new PaymentMakeDonateRequest(type, donate);
     }
 
-    public PaymentWebmoneyInvoice webmoneyInvoice(long wmid, String wallet, int dollars) {
-        return new PaymentWebmoneyInvoice(wmid, wallet, dollars);
+    public PaymentWebMoneyInvoice webmoneyInvoice(long wmid, String wallet, int dollars) {
+        return new PaymentWebMoneyInvoice(wmid, wallet, dollars);
     }
 
     public PaymentSmsDonatesRequest smsDonates(String type) {

@@ -6,24 +6,19 @@ import org.jsoup.nodes.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import ru.flippy.skyscrapers.sdk.api.Error;
 import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.request.BaseRequest;
 import ru.flippy.skyscrapers.sdk.api.model.Date;
 import ru.flippy.skyscrapers.sdk.api.model.DateTime;
 import ru.flippy.skyscrapers.sdk.api.model.Message;
-import ru.flippy.skyscrapers.sdk.api.model.Page;
 import ru.flippy.skyscrapers.sdk.api.model.Time;
 import ru.flippy.skyscrapers.sdk.api.model.User;
+import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
-public class MailDialogHistoryRequest extends BaseRequest {
-
-    public static final int PAGE_NOT_FOUND = 0;
+public class MailDialogHistoryRequest {
 
     private long dialogId;
     private int pageNumber;
@@ -34,54 +29,29 @@ public class MailDialogHistoryRequest extends BaseRequest {
     }
 
     public void execute(final PaginationRequestListener<List<Message>> listener) {
-        RetrofitClient.getApi().mailDialogHistoryPagination(dialogId, pageNumber).enqueue(new Callback<Page>() {
+        RetrofitClient.getApi().mailDialogHistoryPagination(dialogId, pageNumber).setErrorPoint(listener).enqueue(new DocumentCallback() {
             @Override
-            public void onResponse(Call<Page> call, Response<Page> response) {
-                Page page = response.body();
-                if (!response.isSuccessful() || page == null) {
-                    listener.onError(UNKNOWN);
+            public void onResponse(Document document, long wicket) {
+                Parser parser = Parser.from(document);
+                if (parser.checkPageError()) {
+                    listener.onError(Error.NOT_FOUND);
                 } else {
-                    Document document = page.getDocument();
-                    Parser parser = Parser.from(document);
-                    if (parser.checkPageError()) {
-                        listener.onError(PAGE_NOT_FOUND);
+                    Element unlockHistoryElement = document.select("a[class=bl tdn nshd][href*=historyLinkBlock]:contains(История переписки)").first();
+                    if (unlockHistoryElement == null) {
+                        int pageCount = parser.getPageCount(Parser.TYPE_NORMAL);
+                        listener.onResponse(parseMessages(document), pageCount);
                     } else {
-                        Element unlockHistoryElement = document.select("a[class=bl tdn nshd][href*=historyLinkBlock]:contains(История переписки)").first();
-                        if (unlockHistoryElement == null) {
-                            int pageCount = parser.getPageCount(Parser.TYPE_NORMAL);
-                            listener.onResponse(parseMessages(document), pageCount);
-                        } else {
-                            long action = Long.parseLong(unlockHistoryElement.attr("href").split("action=")[1]);
-                            RetrofitClient.getApi().mailUnlockDialogHistory(page.getWicket(), dialogId, pageNumber, action).enqueue(new Callback<Page>() {
-                                @Override
-                                public void onResponse(Call<Page> call, Response<Page> response) {
-                                    Page page = response.body();
-                                    if (!response.isSuccessful() || page == null) {
-                                        listener.onError(UNKNOWN);
-                                    } else {
-                                        Parser parser = Parser.from(page.getDocument());
-                                        if (parser.checkPageError()) {
-                                            listener.onError(PAGE_NOT_FOUND);
-                                        } else {
-                                            int pageCount = parser.getPageCount(Parser.TYPE_NORMAL);
-                                            listener.onResponse(parseMessages(page.getDocument()), pageCount);
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<Page> call, Throwable t) {
-                                    listener.onError(NETWORK);
-                                }
-                            });
-                        }
+                        long action = Long.parseLong(unlockHistoryElement.attr("href").split("action=")[1]);
+                        RetrofitClient.getApi().mailUnlockDialogHistory(wicket, dialogId, pageNumber, action).setErrorPoint(listener).enqueue(new DocumentCallback() {
+                            @Override
+                            public void onResponse(Document document, long wicket) {
+                                Parser parser = Parser.from(document);
+                                int pageCount = parser.getPageCount(Parser.TYPE_NORMAL);
+                                listener.onResponse(parseMessages(document), pageCount);
+                            }
+                        });
                     }
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Page> call, Throwable t) {
-                listener.onError(NETWORK);
             }
         });
     }

@@ -6,61 +6,37 @@ import org.jsoup.nodes.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.request.BaseRequest;
 import ru.flippy.skyscrapers.sdk.api.model.Friend;
-import ru.flippy.skyscrapers.sdk.api.model.Page;
 import ru.flippy.skyscrapers.sdk.api.model.User;
+import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
-public class FriendsRequest extends BaseRequest {
+public class FriendsRequest {
 
-    private int pageNumber;
+    private int page;
 
-    public FriendsRequest(int pageNumber) {
-        this.pageNumber = pageNumber;
+    public FriendsRequest(int page) {
+        this.page = page;
     }
 
     public void execute(final PaginationRequestListener<List<Friend>> listener) {
-        RetrofitClient.getApi().friends().enqueue(new Callback<Page>() {
+        RetrofitClient.getApi().friends().setErrorPoint(listener).enqueue(new DocumentCallback() {
             @Override
-            public void onResponse(Call<Page> call, Response<Page> response) {
-                Page page = response.body();
-                if (!response.isSuccessful() || page == null) {
-                    listener.onError(UNKNOWN);
+            public void onResponse(Document document, long wicket) {
+                final int pageCount = Parser.from(document).getPageCount(Parser.TYPE_NORMAL);
+                if (pageCount == 1) {
+                    listener.onResponse(parseFriends(document), 1);
                 } else {
-                    final int pageCount = Parser.from(page.getDocument()).getPageCount(Parser.TYPE_NORMAL);
-                    if (pageCount == 1) {
-                        listener.onResponse(parseFriends(page.getDocument()), 1);
-                    } else {
-                        RetrofitClient.getApi().friendsPagination(page.getWicket(), pageNumber).enqueue(new Callback<Page>() {
-                            @Override
-                            public void onResponse(Call<Page> call, Response<Page> response) {
-                                Page page = response.body();
-                                if (!response.isSuccessful() || page == null) {
-                                    listener.onError(UNKNOWN);
-                                } else {
-                                    listener.onResponse(parseFriends(page.getDocument()), pageCount);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Page> call, Throwable t) {
-                                listener.onError(NETWORK);
-                            }
-                        });
-                    }
+                    RetrofitClient.getApi().friendsPagination(wicket, page).setErrorPoint(listener).enqueue(new DocumentCallback() {
+                        @Override
+                        public void onResponse(Document document, long wicket) {
+                            listener.onResponse(parseFriends(document), pageCount);
+                        }
+                    });
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Page> call, Throwable t) {
-                listener.onError(NETWORK);
             }
         });
     }

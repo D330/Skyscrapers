@@ -1,7 +1,6 @@
 package ru.flippy.skyscrapers.sdk.api.helper;
 
 import android.support.annotation.CheckResult;
-import android.util.Log;
 
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;

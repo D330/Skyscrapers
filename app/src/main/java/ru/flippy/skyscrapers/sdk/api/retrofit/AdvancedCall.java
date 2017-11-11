@@ -54,6 +54,26 @@ public class AdvancedCall {
         });
     }
 
+    public void enqueue(final DocumentTagCallback callback) {
+        call.enqueue(new Callback<Document>() {
+            @Override
+            public void onResponse(Call<Document> call, Response<Document> response) {
+                Document document = response.body();
+                if (document == null) {
+                    handleError(NETWORK);
+                } else {
+                    long wicket = Parser.from(document).getWicket();
+                    callback.onResponse(getTag(), document, wicket);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Document> call, Throwable t) {
+                handleError(NETWORK);
+            }
+        });
+    }
+
     private void handleError(int errorCode) {
         if (errorable != null) {
             errorable.onError(errorCode);
