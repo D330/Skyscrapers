@@ -22,8 +22,7 @@ public class CookieStore implements CookieJar {
     public List<Cookie> loadForRequest(HttpUrl url) {
         if (cookieStore.containsKey(url.host())) {
             return cookieStore.get(url.host());
-        } else {
-            return new ArrayList<>();
         }
+        return new ArrayList<>();
     }
 }

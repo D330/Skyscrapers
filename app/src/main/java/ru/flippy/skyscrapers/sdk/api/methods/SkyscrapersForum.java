@@ -35,7 +35,7 @@ public class SkyscrapersForum {
     }
 
     public ForumCommentRequest comment(long topicId, int page, String message) {
-        return new ForumCommentRequest(topicId, page, message);
+        return reply(topicId, 0, page, message);
     }
 
     public ForumCommentRequest reply(long topicId, long userId, int page, String message) {

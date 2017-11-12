@@ -1,15 +1,9 @@
-package ru.flippy.skyscrapers.sdk.api.model;
+package ru.flippy.skyscrapers.sdk.api.model.profile;
 
 import java.util.List;
 
-import ru.flippy.skyscrapers.sdk.api.model.profile.Award;
-import ru.flippy.skyscrapers.sdk.api.model.profile.Bonus;
-import ru.flippy.skyscrapers.sdk.api.model.profile.Business;
-import ru.flippy.skyscrapers.sdk.api.model.profile.Cars;
-import ru.flippy.skyscrapers.sdk.api.model.profile.CityInfo;
-import ru.flippy.skyscrapers.sdk.api.model.profile.Experience;
-import ru.flippy.skyscrapers.sdk.api.model.profile.Marriage;
-import ru.flippy.skyscrapers.sdk.api.model.profile.Personal;
+import ru.flippy.skyscrapers.sdk.api.model.User;
+import ru.flippy.skyscrapers.sdk.api.model.time.Date;
 
 public class Profile extends User {
 

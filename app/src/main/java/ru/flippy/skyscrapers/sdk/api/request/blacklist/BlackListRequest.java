@@ -1,17 +1,15 @@
 package ru.flippy.skyscrapers.sdk.api.request.blacklist;
 
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.model.BlackListUser;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.model.User;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class BlackListRequest {
@@ -22,34 +20,34 @@ public class BlackListRequest {
         this.page = page;
     }
 
-    public void execute(final PaginationRequestListener<List<BlackListUser>> listener) {
-        RetrofitClient.getApi().blacklist().setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                Parser parser = Parser.from(document);
-                if (parser.getPageCount(Parser.TYPE_WICKET) == 1) {
-                    listener.onResponse(parseBlackList(document), 1);
-                } else {
-                    RetrofitClient.getApi().blacklistLastPage(wicket).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                        @Override
-                        public void onResponse(Document document, long wicket) {
-                            final int pageCount = Parser.from(document).getPageCount(Parser.TYPE_WICKET);
-                            RetrofitClient.getApi().blacklistPagination(wicket, pageCount).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                                @Override
-                                public void onResponse(Document document, long wicket) {
-                                    listener.onResponse(parseBlackList(document), pageCount);
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-        });
+    public void execute(final PaginationRequestListener<List<User>> listener) {
+        RetrofitClient.getApi().blacklist()
+                .error(listener)
+                .success(new SourceCallback() {
+                    @Override
+                    public void onResponse(Source doc) {
+                        RetrofitClient.getApi().blacklistLastPage(doc.wicket())
+                                .error(listener)
+                                .success(new SourceCallback() {
+                                    @Override
+                                    public void onResponse(Source doc) {
+                                        RetrofitClient.getApi().blacklistPagination(doc.wicket(), page)
+                                                .error(listener)
+                                                .success(new SourceCallback() {
+                                                    @Override
+                                                    public void onResponse(Source doc) {
+                                                        listener.onResponse(parseBlackList(doc), doc.pagination());
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                });
     }
 
-    private List<BlackListUser> parseBlackList(Document document) {
-        List<BlackListUser> blackListUsers = new ArrayList<>();
-        for (Element userImg : document.select("div.m5>div>span>img[src*=/user/]")) {
+    private List<User> parseBlackList(Source doc) {
+        List<User> blackListUsers = new ArrayList<>();
+        for (Element userImg : doc.select("div.m5>div>span>img[src*=/user/]")) {
             Element userSpan = userImg.parent();
             Element userA = userSpan.select("span.user>a").first();
             long id = Utils.getValueAfterLastSlash(userA.attr("href"));
@@ -67,7 +65,7 @@ public class BlackListRequest {
             } else if (userImg.attr("src").contains("off")) {
                 online = User.online.OFFLINE;
             }
-            BlackListUser blackListUser = new BlackListUser();
+            User blackListUser = new User();
             blackListUser.setId(id);
             blackListUser.setNick(nick);
             blackListUser.setLevel(level);

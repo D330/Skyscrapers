@@ -3,7 +3,7 @@ package ru.flippy.skyscrapers.sdk.api.helper;
 import android.support.annotation.CheckResult;
 
 import org.jsoup.Connection;
-import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
 
 import java.util.HashMap;
@@ -11,41 +11,32 @@ import java.util.List;
 
 public class FormParser {
 
-    private FormParser() {
+    private Source doc;
+    private HashMap<String, String> postData;
+
+    public static FormParser parse(Source doc) {
+        FormParser instance = new FormParser();
+        instance.doc = doc;
+        return instance;
     }
 
-    public static boolean checkForm(Document document, String actionContains) {
-        return !document.select("form[action*=" + actionContains + "]").isEmpty();
+    public FormParser findByAction(String actionContains) {
+        Element form = doc.select("form[action*=" + actionContains + "]").first();
+        List<Connection.KeyVal> formData = ((FormElement) form).formData();
+        postData = new HashMap<>(formData.size());
+        for (Connection.KeyVal formInput : formData) {
+            postData.put(formInput.key(), formInput.value());
+        }
+        return this;
     }
 
-    public static Builder parse(Document document) {
-        return new FormParser().new Builder(document);
+    public FormParser input(String key, Object value) {
+        postData.put(key, String.valueOf(value));
+        return this;
     }
 
-    public class Builder {
-
-        private Document document;
-        private HashMap<String, String> postData;
-
-        private Builder(Document document) {
-            this.document = document;
-        }
-
-        public Builder findByAction(String actionContains) {
-            FormElement form = (FormElement) document.select("form[action*=" + actionContains + "]").first();
-            List<Connection.KeyVal> formData = form.formData();
-            postData = new HashMap<>(formData.size());
-            return this;
-        }
-
-        public Builder input(String key, Object value) {
-            postData.put(key, String.valueOf(value));
-            return this;
-        }
-
-        @CheckResult
-        public HashMap<String, String> build() {
-            return postData;
-        }
+    @CheckResult
+    public HashMap<String, String> build() {
+        return postData;
     }
 }

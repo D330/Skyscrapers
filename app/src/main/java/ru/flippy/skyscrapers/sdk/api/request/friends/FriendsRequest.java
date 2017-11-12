@@ -1,17 +1,15 @@
 package ru.flippy.skyscrapers.sdk.api.request.friends;
 
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.model.Friend;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.model.User;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class FriendsRequest {
@@ -22,28 +20,27 @@ public class FriendsRequest {
         this.page = page;
     }
 
-    public void execute(final PaginationRequestListener<List<Friend>> listener) {
-        RetrofitClient.getApi().friends().setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                final int pageCount = Parser.from(document).getPageCount(Parser.TYPE_NORMAL);
-                if (pageCount == 1) {
-                    listener.onResponse(parseFriends(document), 1);
-                } else {
-                    RetrofitClient.getApi().friendsPagination(wicket, page).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                        @Override
-                        public void onResponse(Document document, long wicket) {
-                            listener.onResponse(parseFriends(document), pageCount);
-                        }
-                    });
-                }
-            }
-        });
+    public void execute(final PaginationRequestListener<List<User>> listener) {
+        RetrofitClient.getApi().friends()
+                .error(listener)
+                .success(new SourceCallback() {
+                    @Override
+                    public void onResponse(Source doc) {
+                        RetrofitClient.getApi().friendsPagination(doc.wicket(), page)
+                                .error(listener)
+                                .success(new SourceCallback() {
+                                    @Override
+                                    public void onResponse(Source doc) {
+                                        listener.onResponse(parseFriends(doc), doc.pagination());
+                                    }
+                                });
+                    }
+                });
     }
 
-    private List<Friend> parseFriends(Document document) {
-        List<Friend> friends = new ArrayList<>();
-        for (Element userImg : document.select("div.m5>div>span>img[src*=/user/]")) {
+    private List<User> parseFriends(Source doc) {
+        List<User> friends = new ArrayList<>();
+        for (Element userImg : doc.select("div.m5>div>span>img[src*=/user/]")) {
             Element userSpan = userImg.parent();
             Element userA = userSpan.select("span.user>a").first();
             long id = Utils.getValueAfterLastSlash(userA.attr("href"));
@@ -56,7 +53,7 @@ public class FriendsRequest {
             } else if (userImg.attr("src").contains("off")) {
                 online = User.online.OFFLINE;
             }
-            Friend friend = new Friend();
+            User friend = new User();
             friend.setId(id);
             friend.setNick(nick);
             friend.setLevel(level);

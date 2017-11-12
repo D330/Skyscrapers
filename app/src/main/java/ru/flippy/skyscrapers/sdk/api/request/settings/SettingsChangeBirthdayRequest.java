@@ -1,14 +1,13 @@
 package ru.flippy.skyscrapers.sdk.api.request.settings;
 
-import org.jsoup.nodes.Document;
-
 import java.util.HashMap;
 
 import ru.flippy.skyscrapers.sdk.api.Error;
 import ru.flippy.skyscrapers.sdk.api.helper.FormParser;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class SettingsChangeBirthdayRequest {
 
@@ -21,26 +20,30 @@ public class SettingsChangeBirthdayRequest {
     }
 
     public void execute(final ActionRequestListener listener) {
-        RetrofitClient.getApi().settings().setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                if (!FormParser.checkForm(document, "birthdayForm")) {
-                    listener.onError(Error.ALREADY);
-                } else {
-                    HashMap<String, String> postData = FormParser.parse(document)
-                            .findByAction("birthdayForm")
-                            .input("birthdayDay", birthdayDay)
-                            .input("birthdayMonth", birthdayMonth)
-                            .input("birthdayYear", birthdayYear)
-                            .build();
-                    RetrofitClient.getApi().settingsChangeBirthday(wicket, postData).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                        @Override
-                        public void onResponse(Document document, long wicket) {
-                            listener.onSuccess();
+        RetrofitClient.getApi().settings()
+                .error(listener)
+                .success(new SourceCallback() {
+                    @Override
+                    public void onResponse(Source doc) {
+                        if (!doc.checkForm("birthdayForm")) {
+                            listener.onError(Error.ALREADY);
+                        } else {
+                            HashMap<String, String> postData = FormParser.parse(doc)
+                                    .findByAction("birthdayForm")
+                                    .input("birthdayDay", birthdayDay)
+                                    .input("birthdayMonth", birthdayMonth)
+                                    .input("birthdayYear", birthdayYear)
+                                    .build();
+                            RetrofitClient.getApi().settingsChangeBirthday(doc.wicket(), postData)
+                                    .error(listener)
+                                    .success(new SourceCallback() {
+                                        @Override
+                                        public void onResponse(Source doc) {
+                                            listener.onSuccess();
+                                        }
+                                    });
                         }
-                    });
-                }
-            }
-        });
+                    }
+                });
     }
 }

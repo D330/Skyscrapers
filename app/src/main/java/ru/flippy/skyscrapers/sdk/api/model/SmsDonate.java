@@ -1,6 +1,7 @@
 package ru.flippy.skyscrapers.sdk.api.model;
 
 public class SmsDonate {
+
     private int number, dollars;
     private String price, currency;
     private boolean approximately, nds;

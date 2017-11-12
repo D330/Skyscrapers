@@ -1,12 +1,10 @@
 package ru.flippy.skyscrapers.sdk.api.request.city;
 
-import org.jsoup.nodes.Document;
-
 import ru.flippy.skyscrapers.sdk.api.Error;
-import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class CityChangeRoleRequest {
 
@@ -19,30 +17,35 @@ public class CityChangeRoleRequest {
     }
 
     public void execute(final ActionRequestListener listener) {
-        RetrofitClient.getApi().cityChangeRolePage(userId).setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                Parser parser = Parser.from(document);
-                if (parser.getLink(String.valueOf(roleLevel)) == null) {
-                    listener.onError(Error.ACCESS_DENIED);
-                } else {
-                    RetrofitClient.getApi().cityChangeRole(wicket, userId, roleLevel).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                        @Override
-                        public void onResponse(Document document, long wicket) {
-                            if (roleLevel < 100) {
-                                listener.onSuccess();
-                            } else {
-                                RetrofitClient.getApi().confirm(wicket).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                                    @Override
-                                    public void onResponse(Document document, long wicket) {
-                                        listener.onSuccess();
-                                    }
-                                });
-                            }
+        RetrofitClient.getApi().cityChangeRolePage(userId)
+                .error(listener)
+                .success(new SourceCallback() {
+                    @Override
+                    public void onResponse(Source doc) {
+                        if (doc.getLink(String.valueOf(roleLevel)) == null) {
+                            listener.onError(Error.ACCESS_DENIED);
+                        } else {
+                            RetrofitClient.getApi().cityChangeRole(doc.wicket(), userId, roleLevel)
+                                    .error(listener)
+                                    .success(new SourceCallback() {
+                                        @Override
+                                        public void onResponse(Source doc) {
+                                            if (roleLevel < 100) {
+                                                listener.onSuccess();
+                                            } else {
+                                                RetrofitClient.getApi().confirm(doc.wicket())
+                                                        .error(listener)
+                                                        .success(new SourceCallback() {
+                                                            @Override
+                                                            public void onResponse(Source doc) {
+                                                                listener.onSuccess();
+                                                            }
+                                                        });
+                                            }
+                                        }
+                                    });
                         }
-                    });
-                }
-            }
-        });
+                    }
+                });
     }
 }

@@ -3,9 +3,9 @@ package ru.flippy.skyscrapers.sdk.api.model;
 import java.util.List;
 
 public class ForumSection {
+
     private List<TopicItem> topics;
     private List<User> moderators;
-    private int pageCount;
 
     public List<TopicItem> getTopics() {
         return topics;
@@ -21,13 +21,5 @@ public class ForumSection {
 
     public void setModerators(List<User> moderators) {
         this.moderators = moderators;
-    }
-
-    public int getPageCount() {
-        return pageCount;
-    }
-
-    public void setPageCount(int pageCount) {
-        this.pageCount = pageCount;
     }
 }

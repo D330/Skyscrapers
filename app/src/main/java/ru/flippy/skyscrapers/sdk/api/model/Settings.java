@@ -1,6 +1,8 @@
 package ru.flippy.skyscrapers.sdk.api.model;
 
-public class SettingsData {
+import ru.flippy.skyscrapers.sdk.api.model.time.Date;
+
+public class Settings {
 
     private String nick, about;
     private Date birthday;

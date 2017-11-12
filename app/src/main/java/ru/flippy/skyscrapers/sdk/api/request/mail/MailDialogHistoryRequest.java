@@ -1,21 +1,19 @@
 package ru.flippy.skyscrapers.sdk.api.request.mail;
 
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.flippy.skyscrapers.sdk.api.Error;
-import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.model.Date;
-import ru.flippy.skyscrapers.sdk.api.model.DateTime;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.model.Message;
-import ru.flippy.skyscrapers.sdk.api.model.Time;
 import ru.flippy.skyscrapers.sdk.api.model.User;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.model.time.Date;
+import ru.flippy.skyscrapers.sdk.api.model.time.DateTime;
+import ru.flippy.skyscrapers.sdk.api.model.time.Time;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class MailDialogHistoryRequest {
@@ -29,37 +27,33 @@ public class MailDialogHistoryRequest {
     }
 
     public void execute(final PaginationRequestListener<List<Message>> listener) {
-        RetrofitClient.getApi().mailDialogHistoryPagination(dialogId, pageNumber).setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                Parser parser = Parser.from(document);
-                if (parser.checkPageError()) {
-                    listener.onError(Error.NOT_FOUND);
-                } else {
-                    Element unlockHistoryElement = document.select("a[class=bl tdn nshd][href*=historyLinkBlock]:contains(История переписки)").first();
-                    if (unlockHistoryElement == null) {
-                        int pageCount = parser.getPageCount(Parser.TYPE_NORMAL);
-                        listener.onResponse(parseMessages(document), pageCount);
-                    } else {
-                        long action = Long.parseLong(unlockHistoryElement.attr("href").split("action=")[1]);
-                        RetrofitClient.getApi().mailUnlockDialogHistory(wicket, dialogId, pageNumber, action).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                            @Override
-                            public void onResponse(Document document, long wicket) {
-                                Parser parser = Parser.from(document);
-                                int pageCount = parser.getPageCount(Parser.TYPE_NORMAL);
-                                listener.onResponse(parseMessages(document), pageCount);
-                            }
-                        });
+        RetrofitClient.getApi().mailDialogHistoryPagination(dialogId, pageNumber)
+                .error(listener)
+                .success(new SourceCallback() {
+                    @Override
+                    public void onResponse(Source doc) {
+                        Element unlockHistoryElement = doc.select("a[class=bl tdn nshd][href*=historyLinkBlock]:contains(История переписки)").first();
+                        if (unlockHistoryElement == null) {
+                            listener.onResponse(parseMessages(doc), doc.pagination());
+                        } else {
+                            long action = Long.parseLong(unlockHistoryElement.attr("href").split("action=")[1]);
+                            RetrofitClient.getApi().mailUnlockDialogHistory(doc.wicket(), dialogId, pageNumber, action)
+                                    .error(listener)
+                                    .success(new SourceCallback() {
+                                        @Override
+                                        public void onResponse(Source doc) {
+                                            listener.onResponse(parseMessages(doc), doc.pagination());
+                                        }
+                                    });
+                        }
                     }
-                }
-            }
-        });
+                });
     }
 
-    private List<Message> parseMessages(Document document) {
+    private List<Message> parseMessages(Source doc) {
         List<Message> messages = new ArrayList<>();
-        document.select("div.hr").remove();
-        for (Element messageElement : document.select("div.cntr:contains(История переписки)").first().nextElementSibling().select("div>div:has(span.user)")) {
+        doc.select("div.hr").remove();
+        for (Element messageElement : doc.select("div.cntr:contains(История переписки)").first().nextElementSibling().select("div>div:has(span.user)")) {
             Message message = new Message();
             User author = new User();
             Element userElement = messageElement.select("span.tdn>span.user>a").first();

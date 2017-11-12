@@ -15,7 +15,6 @@ public class QuestionMarkInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request original = chain.request();
         String originalUrl = original.url().toString();
-        Log.d("QuestionMarkInterceptor", originalUrl.replace(URLEncoder.encode("¿", "UTF-8"), "?"));
         Request request = original.newBuilder()
                 .method(original.method(), original.body())
                 .url(originalUrl.replace(URLEncoder.encode("¿", "UTF-8"), "?"))

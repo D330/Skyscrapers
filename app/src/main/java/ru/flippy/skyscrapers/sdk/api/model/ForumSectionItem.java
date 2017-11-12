@@ -1,6 +1,7 @@
 package ru.flippy.skyscrapers.sdk.api.model;
 
 public class ForumSectionItem {
+
     private long id;
     private String name, description;
     private boolean read;

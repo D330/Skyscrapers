@@ -1,5 +1,7 @@
 package ru.flippy.skyscrapers.sdk.api.model;
 
+import ru.flippy.skyscrapers.sdk.api.model.time.Time;
+
 public class TotalData {
 
     private User authUserData;

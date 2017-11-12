@@ -1,13 +1,12 @@
 package ru.flippy.skyscrapers.sdk.api.request.payment;
 
-import org.jsoup.nodes.Document;
-
 import java.util.HashMap;
 
 import ru.flippy.skyscrapers.sdk.api.helper.FormParser;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class PaymentChangePhoneRequest {
 
@@ -18,25 +17,31 @@ public class PaymentChangePhoneRequest {
     }
 
     public void execute(final ActionRequestListener listener) {
-        RetrofitClient.getApi().paymentDonatePage("xMobilePayment").setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                RetrofitClient.getApi().paymentChangePhonePage(wicket).setErrorPoint(listener).enqueue(new DocumentCallback() {
+        RetrofitClient.getApi().paymentDonatePage("xMobilePayment")
+                .error(listener)
+                .success(new SourceCallback() {
                     @Override
-                    public void onResponse(Document document, long wicket) {
-                        HashMap<String, String> postData = FormParser.parse(document)
-                                .findByAction("emptyPhoneBlock")
-                                .input("phone", phone)
-                                .build();
-                        RetrofitClient.getApi().paymentChangePhone(wicket, postData).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                            @Override
-                            public void onResponse(Document document, long wicket) {
-                                listener.onSuccess();
-                            }
-                        });
+                    public void onResponse(Source doc) {
+                        RetrofitClient.getApi().paymentChangePhonePage(doc.wicket())
+                                .error(listener)
+                                .success(new SourceCallback() {
+                                    @Override
+                                    public void onResponse(Source doc) {
+                                        HashMap<String, String> postData = FormParser.parse(doc)
+                                                .findByAction("emptyPhoneBlock")
+                                                .input("phone", phone)
+                                                .build();
+                                        RetrofitClient.getApi().paymentChangePhone(doc.wicket(), postData)
+                                                .error(listener)
+                                                .success(new SourceCallback() {
+                                                    @Override
+                                                    public void onResponse(Source doc) {
+                                                        listener.onSuccess();
+                                                    }
+                                                });
+                                    }
+                                });
                     }
                 });
-            }
-        });
     }
 }

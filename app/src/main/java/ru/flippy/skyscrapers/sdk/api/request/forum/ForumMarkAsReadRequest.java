@@ -1,12 +1,10 @@
 package ru.flippy.skyscrapers.sdk.api.request.forum;
 
-import org.jsoup.nodes.Document;
-
 import ru.flippy.skyscrapers.sdk.api.Error;
-import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class ForumMarkAsReadRequest {
 
@@ -17,20 +15,24 @@ public class ForumMarkAsReadRequest {
     }
 
     public void execute(final ActionRequestListener listener) {
-        RetrofitClient.getApi().forumTopics(sectionId, 1).setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                if (Parser.from(document).getLink("markAsReadLink") == null) {
-                    listener.onError(Error.ALREADY);
-                } else {
-                    RetrofitClient.getApi().forumMarkAsRead(sectionId, wicket).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                        @Override
-                        public void onResponse(Document document, long wicket) {
-                            listener.onSuccess();
+        RetrofitClient.getApi().forumTopics(sectionId, 1)
+                .error(listener)
+                .success(new SourceCallback() {
+                    @Override
+                    public void onResponse(Source doc) {
+                        if (doc.getLink("markAsReadLink") == null) {
+                            listener.onError(Error.ALREADY);
+                        } else {
+                            RetrofitClient.getApi().forumMarkAsRead(sectionId, doc.wicket())
+                                    .error(listener)
+                                    .success(new SourceCallback() {
+                                        @Override
+                                        public void onResponse(Source doc) {
+                                            listener.onSuccess();
+                                        }
+                                    });
                         }
-                    });
-                }
-            }
-        });
+                    }
+                });
     }
 }

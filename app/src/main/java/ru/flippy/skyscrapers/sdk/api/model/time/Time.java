@@ -1,4 +1,4 @@
-package ru.flippy.skyscrapers.sdk.api.model;
+package ru.flippy.skyscrapers.sdk.api.model.time;
 
 public class Time {
 

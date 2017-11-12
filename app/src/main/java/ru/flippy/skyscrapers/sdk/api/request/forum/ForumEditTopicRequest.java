@@ -1,14 +1,13 @@
 package ru.flippy.skyscrapers.sdk.api.request.forum;
 
-import org.jsoup.nodes.Document;
-
 import java.util.HashMap;
 
 import ru.flippy.skyscrapers.sdk.api.Error;
 import ru.flippy.skyscrapers.sdk.api.helper.FormParser;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class ForumEditTopicRequest {
 
@@ -22,25 +21,29 @@ public class ForumEditTopicRequest {
     }
 
     public void execute(final ActionRequestListener listener) {
-        RetrofitClient.getApi().forumEditTopicPage(topicId).setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                HashMap<String, String> postData = FormParser.parse(document)
-                        .findByAction("StaticPostHandler")
-                        .input("staticForm:subject", title)
-                        .input("staticForm:text", body)
-                        .build();
-                RetrofitClient.getApi().forumEditTopic(topicId, postData).setErrorPoint(listener).enqueue(new DocumentCallback() {
+        RetrofitClient.getApi().forumEditTopicPage(topicId)
+                .error(listener)
+                .success(new SourceCallback() {
                     @Override
-                    public void onResponse(Document document, long wicket) {
-                        if (document.title().equalsIgnoreCase(title)) {
-                            listener.onSuccess();
-                        } else {
-                            listener.onError(Error.UNKNOWN);
-                        }
+                    public void onResponse(Source doc) {
+                        HashMap<String, String> postData = FormParser.parse(doc)
+                                .findByAction("StaticPostHandler")
+                                .input("staticForm:subject", title)
+                                .input("staticForm:text", body)
+                                .build();
+                        RetrofitClient.getApi().forumEditTopic(topicId, postData)
+                                .error(listener)
+                                .success(new SourceCallback() {
+                                    @Override
+                                    public void onResponse(Source doc) {
+                                        if (doc.title().equalsIgnoreCase(title)) {
+                                            listener.onSuccess();
+                                        } else {
+                                            listener.onError(Error.UNKNOWN);
+                                        }
+                                    }
+                                });
                     }
                 });
-            }
-        });
     }
 }

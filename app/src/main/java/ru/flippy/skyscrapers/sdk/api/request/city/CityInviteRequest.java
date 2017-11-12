@@ -1,12 +1,11 @@
 package ru.flippy.skyscrapers.sdk.api.request.city;
 
-import org.jsoup.nodes.Document;
-
 import ru.flippy.skyscrapers.sdk.api.Error;
-import ru.flippy.skyscrapers.sdk.api.helper.Parser;
-import ru.flippy.skyscrapers.sdk.api.retrofit.DocumentCallback;
+import ru.flippy.skyscrapers.sdk.api.helper.Source;
+import ru.flippy.skyscrapers.sdk.api.model.Feedback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
+import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class CityInviteRequest {
 
@@ -17,28 +16,30 @@ public class CityInviteRequest {
     }
 
     public void execute(final ActionRequestListener listener) {
-        RetrofitClient.getApi().profile(userId).setErrorPoint(listener).enqueue(new DocumentCallback() {
-            @Override
-            public void onResponse(Document document, long wicket) {
-                Parser parser = Parser.from(document);
-                if (parser.getLink("guildInvite") != null) {
-                    listener.onError(Error.ACCESS_DENIED);
-                } else {
-                    RetrofitClient.getApi().cityInvite(wicket, userId).setErrorPoint(listener).enqueue(new DocumentCallback() {
-                        @Override
-                        public void onResponse(Document document, long wicket) {
-                            Parser parser = Parser.from(document);
-                            if (parser.checkFeedBack(Parser.FEEDBACK_INFO, "Приглащение отправлено")) {
-                                listener.onSuccess();
-                            } else if (parser.checkFeedBack(Parser.FEEDBACK_ERROR, "")) {
-                                listener.onError(Error.BUSY);
-                            } else {
-                                listener.onError(Error.UNKNOWN);
-                            }
+        RetrofitClient.getApi().profile(userId)
+                .error(listener)
+                .success(new SourceCallback() {
+                    @Override
+                    public void onResponse(Source doc) {
+                        if (doc.checkLink("guildInvite")) {
+                            listener.onError(Error.ACCESS_DENIED);
+                        } else {
+                            RetrofitClient.getApi().cityInvite(doc.wicket(), userId)
+                                    .error(listener)
+                                    .success(new SourceCallback() {
+                                        @Override
+                                        public void onResponse(Source doc) {
+                                            if (doc.checkFeedBack(Feedback.Type.INFO, "Приглащение отправлено")) {
+                                                listener.onSuccess();
+                                            } else if (doc.checkFeedBack(Feedback.Type.ERROR, "")) {
+                                                listener.onError(Error.BUSY);
+                                            } else {
+                                                listener.onError(Error.UNKNOWN);
+                                            }
+                                        }
+                                    });
                         }
-                    });
-                }
-            }
-        });
+                    }
+                });
     }
 }

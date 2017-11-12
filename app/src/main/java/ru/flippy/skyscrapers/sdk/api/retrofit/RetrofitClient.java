@@ -14,8 +14,8 @@ public class RetrofitClient {
                 .build();
         Retrofit skyscrapersClient = new Retrofit.Builder()
                 .client(okHttpClient)
-                .addConverterFactory(new DocumentConverterFactory())
-                .addCallAdapterFactory(new DocumentCallAdapterFactory())
+                .addConverterFactory(new SourceConverterFactory())
+                .addCallAdapterFactory(new SourceCallAdapterFactory())
                 .baseUrl(ApiService.ENDPOINT)
                 .build();
         skyscrapersApi = skyscrapersClient.create(ApiService.class);

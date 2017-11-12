@@ -1,6 +1,7 @@
 package ru.flippy.skyscrapers.sdk.api.model;
 
 public class TopicItem {
+
     private long id;
     private String name;
     private boolean pinned, read, closed;

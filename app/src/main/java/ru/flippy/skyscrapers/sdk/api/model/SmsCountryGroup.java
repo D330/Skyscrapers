@@ -3,6 +3,7 @@ package ru.flippy.skyscrapers.sdk.api.model;
 import java.util.List;
 
 public class SmsCountryGroup {
+
     private String country;
     private List<String> operators;
     private List<SmsDonate> donates;
