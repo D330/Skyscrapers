@@ -11,15 +11,10 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 import ru.flippy.skyscrapers.sdk.api.helper.Source;
 
-public class SourceConverterFactory extends Converter.Factory {
+class SourceConverterFactory extends Converter.Factory {
 
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
-        return new Converter<ResponseBody, Source>() {
-            @Override
-            public Source convert(ResponseBody response) throws IOException {
-                return (Source) Jsoup.parse(response.string());
-            }
-        };
+        return (Converter<ResponseBody, Source>) response -> (Source) Jsoup.parse(response.string());
     }
 }

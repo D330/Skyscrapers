@@ -16,8 +16,6 @@ import ru.flippy.skyscrapers.sdk.api.model.MiniMessage;
 import ru.flippy.skyscrapers.sdk.api.model.profile.Profile;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.RequestListener;
-import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
-import ru.flippy.skyscrapers.sdk.listener.SourceTagCallback;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class MailDialogsRequest {
@@ -30,70 +28,62 @@ public class MailDialogsRequest {
     public void execute(final RequestListener<List<Dialog>> listener) {
         RetrofitClient.getApi().mail()
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        Element content = doc.select("div.m5").first();
-                        if (!content.select("div.minor:contains(Почта пустая, писем нет)").isEmpty()) {
-                            listener.onResponse(new ArrayList<Dialog>());
-                        } else {
-                            int pageCount = doc.pagination().getPageCount();
-                            pages = new FixedSizeList<>(pageCount);
-                            for (int pageNumber = 0; pageNumber < pageCount; pageNumber++) {
-                                RetrofitClient.getApi().mailPagination(pageNumber)
-                                        .setTag(pageCount - pageNumber - 1)
-                                        .error(listener)
-                                        .success(new SourceTagCallback() {
-                                            @Override
-                                            public void onResponse(Object tag, Source doc) {
-                                                pages.set((int) tag, doc);
-                                                if (pages.isFilled()) {
-                                                    messages = new LinkedHashMap<>();
-                                                    for (Source page : pages) {
-                                                        Elements messageElements = page.select("div.m5").first().select("div>div:has(span.tdn>span.user)");
-                                                        //сообщения снизу вверх
-                                                        for (int i = messageElements.size() - 1; i >= 0; i--) {
-                                                            Element messageElement = messageElements.get(i);
-                                                            Element userElement = messageElement.select("span.tdn>span.user>a").first();
-                                                            Element msgElement = messageElement.select("a[href*=/mail/read/id/]").first();
-                                                            MiniMessage message = new MiniMessage();
-                                                            message.setId(Utils.getValueAfterLastSlash(msgElement.attr("href")));
-                                                            message.setText(msgElement.select("span").first().text());
-                                                            message.setOut(messageElement.select("img[src*=letter]").first().attr("src").contains("letterout"));
-                                                            message.setRead(msgElement.attr("class").endsWith("minor"));
-                                                            long interlocutorId = Utils.getValueAfterLastSlash(userElement.attr("href"));
-                                                            messages.put(interlocutorId, message);
-                                                        }
-                                                    }
-                                                    //теперь LinkedHashMap содержит последние сообщения всех диалогов
-                                                    dialogs = new FixedSizeList<>(messages.size());
-                                                    interlocutorIds = new ArrayList<>(messages.keySet());
-                                                    for (Long interlocutorId : interlocutorIds) {
-                                                        SkyscrapersApi.getProfile(interlocutorId).execute(new RequestListener<Profile>() {
-                                                            @Override
-                                                            public void onResponse(Profile profile) {
-                                                                long profileId = profile.getId();
-                                                                MiniMessage lastMessage = messages.get(profileId);
-                                                                Dialog dialog = new Dialog();
-                                                                dialog.setId(lastMessage.getId()); //dialogId = lastMessageId
-                                                                dialog.setLastMessage(lastMessage);
-                                                                dialog.setInterlocutor(profile);
-                                                                dialogs.set(interlocutorIds.indexOf(profileId), dialog);
-                                                                if (dialogs.isFilled()) {
-                                                                    listener.onResponse(dialogs);
-                                                                }
-                                                            }
-
-                                                            @Override
-                                                            public void onError(int errorCode) {
-                                                                listener.onError(Error.NETWORK);
-                                                            }
-                                                        });
-                                                    }
+                .success(mailDoc -> {
+                    Element content = mailDoc.select("div.m5").first();
+                    if (!content.select("div.minor:contains(Почта пустая, писем нет)").isEmpty()) {
+                        listener.onResponse(new ArrayList<>());
+                    } else {
+                        int pageCount = mailDoc.pagination().getPageCount();
+                        pages = new FixedSizeList<>(pageCount);
+                        for (int pageNumber = 0; pageNumber < pageCount; pageNumber++) {
+                            RetrofitClient.getApi().mailPagination(pageNumber)
+                                    .setTag(pageCount - pageNumber - 1)
+                                    .error(listener)
+                                    .success((tag, pageDoc) -> {
+                                        pages.set((int) tag, pageDoc);
+                                        if (pages.isFilled()) {
+                                            messages = new LinkedHashMap<>();
+                                            for (Source page : pages) {
+                                                Elements messageElements = page.select("div.m5").first().select("div>div:has(span.tdn>span.user)");
+                                                for (int i = messageElements.size() - 1; i >= 0; i--) {
+                                                    Element messageElement = messageElements.get(i);
+                                                    Element userElement = messageElement.select("span.tdn>span.user>a").first();
+                                                    Element msgElement = messageElement.select("a[href*=/mail/read/id/]").first();
+                                                    MiniMessage message = new MiniMessage();
+                                                    message.setId(Utils.getValueAfterLastSlash(msgElement.attr("href")));
+                                                    message.setText(msgElement.select("span").first().text());
+                                                    message.setOut(messageElement.select("img[src*=letter]").first().attr("src").contains("letterout"));
+                                                    message.setRead(msgElement.attr("class").endsWith("minor"));
+                                                    long interlocutorId = Utils.getValueAfterLastSlash(userElement.attr("href"));
+                                                    messages.put(interlocutorId, message);
                                                 }
                                             }
-                                        });
-                            }
+                                            dialogs = new FixedSizeList<>(messages.size());
+                                            interlocutorIds = new ArrayList<>(messages.keySet());
+                                            for (Long interlocutorId : interlocutorIds) {
+                                                SkyscrapersApi.getProfile(interlocutorId).execute(new RequestListener<Profile>() {
+                                                    @Override
+                                                    public void onResponse(Profile profile) {
+                                                        long profileId = profile.getId();
+                                                        MiniMessage lastMessage = messages.get(profileId);
+                                                        Dialog dialog = new Dialog();
+                                                        dialog.setId(lastMessage.getId());
+                                                        dialog.setLastMessage(lastMessage);
+                                                        dialog.setInterlocutor(profile);
+                                                        dialogs.set(interlocutorIds.indexOf(profileId), dialog);
+                                                        if (dialogs.isFilled()) {
+                                                            listener.onResponse(dialogs);
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onError(int errorCode) {
+                                                        listener.onError(Error.NETWORK);
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
                         }
                     }
                 });

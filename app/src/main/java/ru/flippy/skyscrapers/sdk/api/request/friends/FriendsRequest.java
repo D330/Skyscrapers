@@ -9,7 +9,6 @@ import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.model.User;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
-import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class FriendsRequest {
@@ -23,19 +22,9 @@ public class FriendsRequest {
     public void execute(final PaginationRequestListener<List<User>> listener) {
         RetrofitClient.getApi().friends()
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        RetrofitClient.getApi().friendsPagination(doc.wicket(), page)
-                                .error(listener)
-                                .success(new SourceCallback() {
-                                    @Override
-                                    public void onResponse(Source doc) {
-                                        listener.onResponse(parseFriends(doc), doc.pagination());
-                                    }
-                                });
-                    }
-                });
+                .success(friendsDoc -> RetrofitClient.getApi().friendsPagination(friendsDoc.wicket(), page)
+                        .error(listener)
+                        .success(needPageDoc -> listener.onResponse(parseFriends(needPageDoc), needPageDoc.pagination())));
     }
 
     private List<User> parseFriends(Source doc) {

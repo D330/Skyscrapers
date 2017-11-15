@@ -8,7 +8,7 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 
-public class CookieStore implements CookieJar {
+class CookieStore implements CookieJar {
 
     private HashMap<String, List<Cookie>> cookieStore = new HashMap<>();
 

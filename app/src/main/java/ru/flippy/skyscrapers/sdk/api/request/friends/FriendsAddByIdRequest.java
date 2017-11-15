@@ -1,11 +1,9 @@
 package ru.flippy.skyscrapers.sdk.api.request.friends;
 
 import ru.flippy.skyscrapers.sdk.api.Error;
-import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.model.Feedback;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
-import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class FriendsAddByIdRequest {
 
@@ -18,25 +16,19 @@ public class FriendsAddByIdRequest {
     public void execute(final ActionRequestListener listener) {
         RetrofitClient.getApi().profile(userId)
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        if (doc.getLink("addFriendLink") == null) {
-                            listener.onError(Error.ALREADY);
-                        } else {
-                            RetrofitClient.getApi().friendsAdd(doc.wicket(), userId)
-                                    .error(listener)
-                                    .success(new SourceCallback() {
-                                        @Override
-                                        public void onResponse(Source doc) {
-                                            if (doc.checkFeedBack(Feedback.Type.INFO, "в друзья")) {
-                                                listener.onSuccess();
-                                            } else {
-                                                listener.onError(Error.UNKNOWN);
-                                            }
-                                        }
-                                    });
-                        }
+                .success(profileDoc -> {
+                    if (profileDoc.getLink("addFriendLink") == null) {
+                        listener.onError(Error.ALREADY);
+                    } else {
+                        RetrofitClient.getApi().friendsAdd(profileDoc.wicket(), userId)
+                                .error(listener)
+                                .success(resultDoc -> {
+                                    if (resultDoc.hasFeedBack(Feedback.Type.INFO, "в друзья")) {
+                                        listener.onSuccess();
+                                    } else {
+                                        listener.onError(Error.UNKNOWN);
+                                    }
+                                });
                     }
                 });
     }

@@ -19,29 +19,16 @@ public class PaymentChangePhoneRequest {
     public void execute(final ActionRequestListener listener) {
         RetrofitClient.getApi().paymentDonatePage("xMobilePayment")
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        RetrofitClient.getApi().paymentChangePhonePage(doc.wicket())
-                                .error(listener)
-                                .success(new SourceCallback() {
-                                    @Override
-                                    public void onResponse(Source doc) {
-                                        HashMap<String, String> postData = FormParser.parse(doc)
-                                                .findByAction("emptyPhoneBlock")
-                                                .input("phone", phone)
-                                                .build();
-                                        RetrofitClient.getApi().paymentChangePhone(doc.wicket(), postData)
-                                                .error(listener)
-                                                .success(new SourceCallback() {
-                                                    @Override
-                                                    public void onResponse(Source doc) {
-                                                        listener.onSuccess();
-                                                    }
-                                                });
-                                    }
-                                });
-                    }
-                });
+                .success(donateDoc -> RetrofitClient.getApi().paymentChangePhonePage(donateDoc.wicket())
+                        .error(listener)
+                        .success(phoneDoc -> {
+                            HashMap<String, String> postData = FormParser.parse(phoneDoc)
+                                    .findByAction("emptyPhoneBlock")
+                                    .input("phone", phone)
+                                    .build();
+                            RetrofitClient.getApi().paymentChangePhone(phoneDoc.wicket(), postData)
+                                    .error(listener)
+                                    .success(resultDoc -> listener.onSuccess());
+                        }));
     }
 }

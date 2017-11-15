@@ -22,27 +22,19 @@ public class SettingsChangeBirthdayRequest {
     public void execute(final ActionRequestListener listener) {
         RetrofitClient.getApi().settings()
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        if (!doc.checkForm("birthdayForm")) {
-                            listener.onError(Error.ALREADY);
-                        } else {
-                            HashMap<String, String> postData = FormParser.parse(doc)
-                                    .findByAction("birthdayForm")
-                                    .input("birthdayDay", birthdayDay)
-                                    .input("birthdayMonth", birthdayMonth)
-                                    .input("birthdayYear", birthdayYear)
-                                    .build();
-                            RetrofitClient.getApi().settingsChangeBirthday(doc.wicket(), postData)
-                                    .error(listener)
-                                    .success(new SourceCallback() {
-                                        @Override
-                                        public void onResponse(Source doc) {
-                                            listener.onSuccess();
-                                        }
-                                    });
-                        }
+                .success(settingsDoc -> {
+                    if (!settingsDoc.hasForm("birthdayForm")) {
+                        listener.onError(Error.ALREADY);
+                    } else {
+                        HashMap<String, String> postData = FormParser.parse(settingsDoc)
+                                .findByAction("birthdayForm")
+                                .input("birthdayDay", birthdayDay)
+                                .input("birthdayMonth", birthdayMonth)
+                                .input("birthdayYear", birthdayYear)
+                                .build();
+                        RetrofitClient.getApi().settingsChangeBirthday(settingsDoc.wicket(), postData)
+                                .error(listener)
+                                .success(resultDoc -> listener.onSuccess());
                     }
                 });
     }

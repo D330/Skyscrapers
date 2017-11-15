@@ -13,39 +13,30 @@ import ru.flippy.skyscrapers.sdk.api.model.time.DateTime;
 import ru.flippy.skyscrapers.sdk.api.model.time.Time;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
-import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class MailDialogHistoryRequest {
 
     private long dialogId;
-    private int pageNumber;
+    private int page;
 
-    public MailDialogHistoryRequest(long dialogId, int pageNumber) {
+    public MailDialogHistoryRequest(long dialogId, int page) {
         this.dialogId = dialogId;
-        this.pageNumber = pageNumber;
+        this.page = page;
     }
 
     public void execute(final PaginationRequestListener<List<Message>> listener) {
-        RetrofitClient.getApi().mailDialogHistoryPagination(dialogId, pageNumber)
+        RetrofitClient.getApi().mailDialogHistoryPagination(dialogId, page)
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        Element unlockHistoryElement = doc.select("a[class=bl tdn nshd][href*=historyLinkBlock]:contains(История переписки)").first();
-                        if (unlockHistoryElement == null) {
-                            listener.onResponse(parseMessages(doc), doc.pagination());
-                        } else {
-                            long action = Long.parseLong(unlockHistoryElement.attr("href").split("action=")[1]);
-                            RetrofitClient.getApi().mailUnlockDialogHistory(doc.wicket(), dialogId, pageNumber, action)
-                                    .error(listener)
-                                    .success(new SourceCallback() {
-                                        @Override
-                                        public void onResponse(Source doc) {
-                                            listener.onResponse(parseMessages(doc), doc.pagination());
-                                        }
-                                    });
-                        }
+                .success(needPageDoc -> {
+                    Element unlockHistoryElement = needPageDoc.select("a[class=bl tdn nshd][href*=historyLinkBlock]:contains(История переписки)").first();
+                    if (unlockHistoryElement == null) {
+                        listener.onResponse(parseMessages(needPageDoc), needPageDoc.pagination());
+                    } else {
+                        long action = Long.parseLong(unlockHistoryElement.attr("href").split("action=")[1]);
+                        RetrofitClient.getApi().mailUnlockDialogHistory(needPageDoc.wicket(), dialogId, page, action)
+                                .error(listener)
+                                .success(unlockedPageDoc -> listener.onResponse(parseMessages(unlockedPageDoc), unlockedPageDoc.pagination()));
                     }
                 });
     }

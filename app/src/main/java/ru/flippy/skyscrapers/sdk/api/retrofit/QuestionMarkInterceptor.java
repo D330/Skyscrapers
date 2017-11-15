@@ -1,7 +1,5 @@
 package ru.flippy.skyscrapers.sdk.api.retrofit;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.URLEncoder;
 
@@ -9,7 +7,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class QuestionMarkInterceptor implements Interceptor {
+class QuestionMarkInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {

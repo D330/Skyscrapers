@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import ru.flippy.skyscrapers.BuildConfig;
 import ru.flippy.skyscrapers.R;
@@ -46,7 +44,6 @@ public class NavigationDrawer {
 
     private TextView onlineCount;
     private TextView time;
-    private TextView appVersion;
 
     private PrimaryDrawerItem makeItem(long identifier, int nameRes, int iconRes) {
         return new PrimaryDrawerItem()
@@ -63,7 +60,7 @@ public class NavigationDrawer {
     public NavigationDrawer(@NonNull final Activity activity) {
         drawer = new DrawerBuilder()
                 .withActivity(activity)
-                .withToolbar((Toolbar) activity.findViewById(R.id.toolbar))
+                .withToolbar(activity.findViewById(R.id.toolbar))
                 .withActionBarDrawerToggleAnimated(true)
                 .withHeader(R.layout.drawer_header)
                 .withFooter(R.layout.drawer_footer)
@@ -87,26 +84,20 @@ public class NavigationDrawer {
                                 .withDisabledTextColorRes(R.color.drawer_navigation_item_disabled)
                                 .withDisabledIconColorRes(R.color.drawer_navigation_item_disabled)
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerListener != null && drawerItem instanceof PrimaryDrawerItem) {
-                            close();
-                            drawerListener.onNavigationItemClick(((Number) drawerItem.getIdentifier()).intValue(), ((PrimaryDrawerItem) drawerItem).getName().getText(activity));
-                            return true;
-                        } else {
-                            return false;
-                        }
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (drawerListener != null && drawerItem instanceof PrimaryDrawerItem) {
+                        close();
+                        drawerListener.onNavigationItemClick(((Number) drawerItem.getIdentifier()).intValue(), ((PrimaryDrawerItem) drawerItem).getName().getText(activity));
+                        return true;
+                    } else {
+                        return false;
                     }
                 })
                 .build();
         View header = drawer.getHeader();
-        header.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                close();
-                drawerListener.onHeaderClick();
-            }
+        header.setOnClickListener(v -> {
+            close();
+            drawerListener.onHeaderClick();
         });
         userIcon = header.findViewById(R.id.drawer_header_user_icon);
         levelProgress = header.findViewById(R.id.drawer_header_level_progress);
@@ -118,28 +109,20 @@ public class NavigationDrawer {
         View footer = drawer.getFooter();
         onlineCount = footer.findViewById(R.id.drawer_footer_online);
         time = footer.findViewById(R.id.drawer_footer_time);
-        appVersion = footer.findViewById(R.id.drawer_footer_app_version);
+        TextView appVersion = footer.findViewById(R.id.drawer_footer_app_version);
         appVersion.setText(String.format(activity.getString(R.string.drawer_footer_app_version), BuildConfig.VERSION_NAME));
-        onlineCount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                close();
-                drawerListener.onFooterOnlineClick();
-            }
+
+        onlineCount.setOnClickListener(v -> {
+            close();
+            drawerListener.onFooterOnlineClick();
         });
-        footer.findViewById(R.id.drawer_footer_more_games).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                close();
-                openURL("http://overmobile.ru/");
-            }
+        footer.findViewById(R.id.drawer_footer_more_games).setOnClickListener(v -> {
+            close();
+            openURL("http://overmobile.ru/");
         });
-        footer.findViewById(R.id.drawer_footer_overmobile_logo).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                close();
-                openURL("http://igrotop.mobi/");
-            }
+        footer.findViewById(R.id.drawer_footer_overmobile_logo).setOnClickListener(v -> {
+            close();
+            openURL("http://igrotop.mobi/");
         });
     }
 

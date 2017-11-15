@@ -20,24 +20,24 @@ public class Source extends Document {
         return has("div[class=m5 cntr amount]:contains(Данная страница недоступна)");
     }
 
-    public boolean checkFeedBack(String type, String feedbackContains) {
+    public boolean has(String cssQuery) {
+        return !select(cssQuery).isEmpty();
+    }
+
+    public boolean hasFeedBack(String type, String feedbackContains) {
         return has("span.feedbackPanel" + type + ":contains(" + feedbackContains + ")");
     }
 
-    public boolean checkForm(String actionContains) {
+    public boolean hasForm(String actionContains) {
         return has("form[action*=" + actionContains + "]");
     }
 
-    public boolean checkLink(String hrefContains) {
+    public boolean hasLink(String hrefContains) {
         return getLink(hrefContains) != null;
     }
 
     public Element getLink(String hrefContains) {
         return select("a[href*=" + hrefContains + "]").first();
-    }
-
-    public boolean has(String cssQuery) {
-        return !select(cssQuery).isEmpty();
     }
 
     public Pagination pagination() {

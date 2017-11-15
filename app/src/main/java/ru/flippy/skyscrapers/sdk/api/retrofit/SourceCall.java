@@ -16,7 +16,7 @@ public class SourceCall {
     private Errorable errorable;
     private Object tag;
 
-    public SourceCall(Call<Source> call) {
+    SourceCall(Call<Source> call) {
         this.call = call;
     }
 

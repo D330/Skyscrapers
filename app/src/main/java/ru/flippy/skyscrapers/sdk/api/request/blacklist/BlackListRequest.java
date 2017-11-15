@@ -9,7 +9,6 @@ import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.model.User;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.PaginationRequestListener;
-import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class BlackListRequest {
@@ -23,26 +22,11 @@ public class BlackListRequest {
     public void execute(final PaginationRequestListener<List<User>> listener) {
         RetrofitClient.getApi().blacklist()
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        RetrofitClient.getApi().blacklistLastPage(doc.wicket())
+                .success(blacklistDoc -> RetrofitClient.getApi().blacklistLastPage(blacklistDoc.wicket())
+                        .error(listener)
+                        .success(lastPageDoc -> RetrofitClient.getApi().blacklistPagination(lastPageDoc.wicket(), page)
                                 .error(listener)
-                                .success(new SourceCallback() {
-                                    @Override
-                                    public void onResponse(Source doc) {
-                                        RetrofitClient.getApi().blacklistPagination(doc.wicket(), page)
-                                                .error(listener)
-                                                .success(new SourceCallback() {
-                                                    @Override
-                                                    public void onResponse(Source doc) {
-                                                        listener.onResponse(parseBlackList(doc), doc.pagination());
-                                                    }
-                                                });
-                                    }
-                                });
-                    }
-                });
+                                .success(needPageDoc -> listener.onResponse(parseBlackList(needPageDoc), needPageDoc.pagination()))));
     }
 
     private List<User> parseBlackList(Source doc) {

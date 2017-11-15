@@ -1,10 +1,8 @@
 package ru.flippy.skyscrapers.sdk.api.request.forum;
 
 import ru.flippy.skyscrapers.sdk.api.Error;
-import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.retrofit.RetrofitClient;
 import ru.flippy.skyscrapers.sdk.listener.ActionRequestListener;
-import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 
 public class ForumMarkAsReadRequest {
 
@@ -17,21 +15,13 @@ public class ForumMarkAsReadRequest {
     public void execute(final ActionRequestListener listener) {
         RetrofitClient.getApi().forumTopics(sectionId, 1)
                 .error(listener)
-                .success(new SourceCallback() {
-                    @Override
-                    public void onResponse(Source doc) {
-                        if (doc.getLink("markAsReadLink") == null) {
-                            listener.onError(Error.ALREADY);
-                        } else {
-                            RetrofitClient.getApi().forumMarkAsRead(sectionId, doc.wicket())
-                                    .error(listener)
-                                    .success(new SourceCallback() {
-                                        @Override
-                                        public void onResponse(Source doc) {
-                                            listener.onSuccess();
-                                        }
-                                    });
-                        }
+                .success(topicsDoc -> {
+                    if (topicsDoc.getLink("markAsReadLink") == null) {
+                        listener.onError(Error.ALREADY);
+                    } else {
+                        RetrofitClient.getApi().forumMarkAsRead(sectionId, topicsDoc.wicket())
+                                .error(listener)
+                                .success(resultDoc -> listener.onSuccess());
                     }
                 });
     }
