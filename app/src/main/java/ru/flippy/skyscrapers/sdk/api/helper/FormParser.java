@@ -11,17 +11,17 @@ import java.util.List;
 
 public class FormParser {
 
-    private Source doc;
+    private Source source;
     private HashMap<String, String> postData;
 
-    public static FormParser parse(Source doc) {
+    public static FormParser parse(Source source) {
         FormParser instance = new FormParser();
-        instance.doc = doc;
+        instance.source = source;
         return instance;
     }
 
     public FormParser findByAction(String actionContains) {
-        Element form = doc.select("form[action*=" + actionContains + "]").first();
+        Element form = source.select("form[action*=" + actionContains + "]").first();
         List<Connection.KeyVal> formData = ((FormElement) form).formData();
         postData = new HashMap<>(formData.size());
         for (Connection.KeyVal formInput : formData) {

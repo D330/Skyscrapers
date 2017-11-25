@@ -50,7 +50,7 @@ public class PaymentSmsDonatesRequest {
                                 cursor = nextElement;
                             }
                         }
-                        Source country = (Source) Jsoup.parse(countryHtml.toString());
+                        Source country = new Source(Jsoup.parse(countryHtml.toString()));
                         List<SmsDonate> smsDonates = new ArrayList<>();
                         for (Element smsLink : country.select("b:has(a.link)")) {
                             SmsDonate smsDonate = new SmsDonate();

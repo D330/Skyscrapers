@@ -7,6 +7,8 @@ import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersForum;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersFriends;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersMail;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersPayment;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersRating;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersSearch;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersSettings;
 import ru.flippy.skyscrapers.sdk.api.request.LoginRequest;
 import ru.flippy.skyscrapers.sdk.api.request.ProfileRequest;
@@ -47,6 +49,14 @@ public class SkyscrapersApi {
 
     public static SkyscrapersPayment payment() {
         return new SkyscrapersPayment();
+    }
+
+    public static SkyscrapersRating rating() {
+        return new SkyscrapersRating();
+    }
+
+    public static SkyscrapersSearch search() {
+        return new SkyscrapersSearch();
     }
 
     public static SkyscrapersSettings settings() {

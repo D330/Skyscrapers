@@ -2,14 +2,25 @@ package ru.flippy.skyscrapers.sdk.api.helper;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import ru.flippy.skyscrapers.sdk.api.model.Pagination;
 import ru.flippy.skyscrapers.sdk.util.Utils;
 
-public class Source extends Document {
+public class Source {
 
-    public Source(String html) {
-        super(html);
+    private Document doc;
+
+    public Source(Document doc) {
+        this.doc = doc;
+    }
+
+    public Elements select(String cssQuery) {
+        return doc.select(cssQuery);
+    }
+
+    public String title() {
+        return doc.title();
     }
 
     public boolean checkPageError() {
@@ -21,7 +32,7 @@ public class Source extends Document {
     }
 
     public boolean has(String cssQuery) {
-        return !select(cssQuery).isEmpty();
+        return !doc.select(cssQuery).isEmpty();
     }
 
     public boolean hasFeedBack(String type, String feedbackContains) {
@@ -37,7 +48,7 @@ public class Source extends Document {
     }
 
     public Element getLink(String hrefContains) {
-        return select("a[href*=" + hrefContains + "]").first();
+        return doc.select("a[href*=" + hrefContains + "]").first();
     }
 
     public Pagination pagination() {
@@ -51,9 +62,9 @@ public class Source extends Document {
             return 1;
         } else {
             if (type == Pagination.Type.NORMAL) {
-                return Integer.parseInt(select("div.pgn>pag").last().text());
+                return Integer.parseInt(doc.select("div.pgn>pag").last().text());
             } else {
-                Element lastPaginationElement = select("div.pgn").first().select(".pag").last();
+                Element lastPaginationElement = doc.select("div.pgn").first().select(".pag").last();
                 if (lastPaginationElement.tagName().equals("a")) {
                     return Utils.getValueAfterLastSlash(lastPaginationElement.attr("href")).intValue();
                 } else {
@@ -64,7 +75,7 @@ public class Source extends Document {
     }
 
     public long wicket() {
-        Element wicketElement = select("form[action*=wicket], a[href*=wicket]").first();
+        Element wicketElement = doc.select("form[action*=wicket], a[href*=wicket]").first();
         if (wicketElement != null) {
             String url = wicketElement.hasAttr("href") ? wicketElement.attr("href") : wicketElement.attr("action");
             String[] splitUrl = url.split(":");

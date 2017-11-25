@@ -1,5 +1,7 @@
 package ru.flippy.skyscrapers.sdk.api.retrofit;
 
+import android.util.Log;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,6 +47,7 @@ public class SourceCall {
             @Override
             public void onFailure(Call<Source> call, Throwable t) {
                 handleError(NETWORK);
+                Log.d("Q", "q", t);
             }
         });
     }

@@ -15,6 +15,6 @@ class SourceConverterFactory extends Converter.Factory {
 
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
-        return (Converter<ResponseBody, Source>) response -> (Source) Jsoup.parse(response.string());
+        return (Converter<ResponseBody, Source>) response -> new Source(Jsoup.parse(response.string()));
     }
 }

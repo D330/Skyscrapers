@@ -155,6 +155,47 @@ public interface ApiService {
     @POST("payment/type/xWebmoneyInvoice/¿wicket:interface=:{wicket}:xWebmoneyInvoice:wmForm::IFormSubmitListener::")
     SourceCall paymentWebmoneyInvoice(@Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
 
+    @GET("rating/type/{type}")
+    SourceCall ratingUsers(@Path("type") int type);
+
+    @GET("rating/type/{type}/¿wicket:interface=:{wicket}:paginator:container:navigation:{index}:pageLink::ILinkListener::")
+    SourceCall ratingUsersPagination(@Path("type") int type, @Path("wicket") long wicket, @Path("index") int index);
+
+    @GET("city/list")
+    SourceCall ratingCity();
+
+    @GET("city/list/¿wicket:interface=:{wicket}:paginator:container:navigation:{index}:pageLink::ILinkListener::")
+    SourceCall ratingCityPagination(@Path("wicket") long wicket, @Path("index") int index);
+
+    @GET("online/find/user")
+    SourceCall searchUserPage();
+
+    @FormUrlEncoded
+    @POST("online/find/user/¿wicket:interface=:{wicket}:searchForm::IFormSubmitListener::")
+    SourceCall searchUser(@Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
+
+    @GET("online/find/user/¿wicket:interface=:{wicket}:searchResult:paginator:container:navigation:{index}:pageLink::ILinkListener::")
+    SourceCall searchUserPagination(@Path("wicket") long wicket, @Path("index") int index);
+
+    @GET("city/search")
+    SourceCall searchCityPage();
+
+    @FormUrlEncoded
+    @POST("city/search/¿wicket:interface=:{wicket}:searchForm::IFormSubmitListener::")
+    SourceCall searchCity(@Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
+
+    @GET("city/search/¿wicket:interface=:{wicket}:searchResult:paginator:container:navigation:{index}:pageLink::ILinkListener::")
+    SourceCall searchCityPagination(@Path("wicket") long wicket, @Path("index") int index);
+
+    @GET("online/nocity")
+    SourceCall searchNoCity();
+
+    @GET("online")
+    SourceCall searchOnline();
+
+    @GET("online/¿wicket:interface=:{wicket}:paginator:container:navigation:{index}:pageLink::ILinkListener::")
+    SourceCall searchOnlinePagination(@Path("wicket") long wicket, @Path("index") int index);
+
     @GET("settings")
     SourceCall settings();
 
