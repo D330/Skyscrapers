@@ -10,6 +10,7 @@ import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersPayment;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersRating;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersSearch;
 import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersSettings;
+import ru.flippy.skyscrapers.sdk.api.methods.SkyscrapersSupport;
 import ru.flippy.skyscrapers.sdk.api.request.LoginRequest;
 import ru.flippy.skyscrapers.sdk.api.request.ProfileRequest;
 
@@ -61,5 +62,9 @@ public class SkyscrapersApi {
 
     public static SkyscrapersSettings settings() {
         return new SkyscrapersSettings();
+    }
+
+    public static SkyscrapersSupport support() {
+        return new SkyscrapersSupport();
     }
 }

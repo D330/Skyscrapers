@@ -27,7 +27,7 @@ public class SearchOnlineRequest {
         if (paginationItem == null) {
             call = RetrofitClient.getApi().searchOnline();
         } else {
-            call = RetrofitClient.getApi().searchUserPagination(paginationItem.getWicket(), paginationItem.getIndex());
+            call = RetrofitClient.getApi().searchOnlinePagination(paginationItem.getWicket(), paginationItem.getIndex());
         }
         call.error(listener).success(
                 onlineDoc -> listener.onResponse(parseOnlineUsers(onlineDoc), onlineDoc.pagination()));

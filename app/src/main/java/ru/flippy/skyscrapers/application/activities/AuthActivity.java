@@ -22,25 +22,18 @@ public class AuthActivity extends AppCompatActivity {
         SkyscrapersApi.login("Query", "zobega900").execute(new ActionRequestListener() {
             @Override
             public void onSuccess() {
-                SkyscrapersApi.search().noCity().execute(new RequestListener<List<NoCityUser>>() {
-                    @Override
-                    public void onResponse(List<NoCityUser> response) {
-                        for (NoCityUser user : response) {
-                            Log.d("Q", user.isFreeForInvitation() + " " +
-                                    user.getDaysInGame() + " " +
-                                    user.getId() + " " +
-                                    user.getNick() + " " +
-                                    user.getLevel() + " " +
-                                    user.getOnline() + " " +
-                                    user.getSex() + "\n\n");
-                        }
-                    }
+                SkyscrapersApi.support().ticketRate(1400517, true, false, true)
+                        .execute(new ActionRequestListener() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d("Q", "success");
+                            }
 
-                    @Override
-                    public void onError(int errorCode) {
+                            @Override
+                            public void onError(int errorCode) {
 
-                    }
-                });
+                            }
+                        });
             }
 
             @Override

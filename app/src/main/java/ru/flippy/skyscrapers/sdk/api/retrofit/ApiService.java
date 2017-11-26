@@ -224,4 +224,30 @@ public interface ApiService {
     @GET("settings/¿wicket:interface=:{wicket}:changeSex::ILinkListener::")
     SourceCall settingsChangeSex(@Path("wicket") long wicket);
 
+    @GET("support/ticket/0/{ticketId}")
+    SourceCall supportTicket(@Path("ticketId") long ticketId);
+
+    @FormUrlEncoded
+    @POST("support/ticket/0/{ticketId}/wicket:interface/:{wicket}:commentForm::IFormSubmitListener::")
+    SourceCall supportTicketComment(@Path("ticketId") long ticketId, @Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
+
+    @GET("support/rate/0/{ticketId}")
+    SourceCall supportRateTicketPage(@Path("ticketId") long ticketId);
+
+    @FormUrlEncoded
+    @POST("support/rate/0/{ticketId}/wicket:interface/:{wicket}:rateForm::IFormSubmitListener::")
+    SourceCall supportRateTicket(@Path("ticketId") long ticketId, @Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
+
+    @GET("support")
+    SourceCall supportTickets();
+
+    @GET("support/¿wicket:interface=:{wicket}:paginator:container:navigation:{index}:pageLink::ILinkListener::")
+    SourceCall supportTicketsPagination(@Path("wicket") long wicket, @Path("index") int index);
+
+    @GET("support/create/type/cat_{type}")
+    SourceCall supportCreateTicketPage(@Path("type") String type);
+
+    @FormUrlEncoded
+    @POST("support/create/type/cat_{type}/wicket:interface/:{wicket}:supportForm::IFormSubmitListener::")
+    SourceCall supportCreateTicket(@Path("type") String type, @Path("wicket") long wicket, @FieldMap HashMap<String, String> postData);
 }
