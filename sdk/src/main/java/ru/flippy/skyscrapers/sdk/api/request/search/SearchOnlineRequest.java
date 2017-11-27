@@ -18,6 +18,10 @@ public class SearchOnlineRequest {
 
     private PaginationItem paginationItem;
 
+    public SearchOnlineRequest() {
+
+    }
+
     public SearchOnlineRequest(PaginationItem paginationItem) {
         this.paginationItem = paginationItem;
     }

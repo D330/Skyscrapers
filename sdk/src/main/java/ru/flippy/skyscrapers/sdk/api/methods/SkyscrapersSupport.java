@@ -14,7 +14,7 @@ public class SkyscrapersSupport {
     }
 
     public SupportTicketsRequest tickets() {
-        return new SupportTicketsRequest(null);
+        return new SupportTicketsRequest();
     }
 
     public SupportTicketsRequest tickets(PaginationItem paginationItem) {

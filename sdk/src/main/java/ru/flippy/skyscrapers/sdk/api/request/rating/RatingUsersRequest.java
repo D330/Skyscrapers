@@ -19,6 +19,10 @@ public class RatingUsersRequest {
     private PaginationItem paginationItem;
     private int type;
 
+    public RatingUsersRequest(int type) {
+        this.type = type;
+    }
+
     public RatingUsersRequest(int type, PaginationItem paginationItem) {
         this.type = type;
         this.paginationItem = paginationItem;

@@ -17,6 +17,10 @@ public class RatingCityRequest {
 
     private PaginationItem paginationItem;
 
+    public RatingCityRequest() {
+
+    }
+
     public RatingCityRequest(PaginationItem paginationItem) {
         this.paginationItem = paginationItem;
     }

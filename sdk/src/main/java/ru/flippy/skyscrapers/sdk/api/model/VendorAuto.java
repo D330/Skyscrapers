@@ -1,9 +1,9 @@
 package ru.flippy.skyscrapers.sdk.api.model;
 
-public class VendorBuff {
-    private long id, time;
+public class VendorAuto {
+    private long id;
     private String name, description;
-    private int bonus;
+    private int bought, max;
 
     public long getId() {
         return id;
@@ -29,19 +29,19 @@ public class VendorBuff {
         this.description = description;
     }
 
-    public int getBonus() {
-        return bonus;
+    public int getBought() {
+        return bought;
     }
 
-    public void setBonus(int bonus) {
-        this.bonus = bonus;
+    public void setBought(int bought) {
+        this.bought = bought;
     }
 
-    public long getTime() {
-        return time;
+    public int getMax() {
+        return max;
     }
 
-    public void setTime(long time) {
-        this.time = time;
+    public void setMax(int max) {
+        this.max = max;
     }
 }

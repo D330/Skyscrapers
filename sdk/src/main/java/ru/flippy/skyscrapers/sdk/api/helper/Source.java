@@ -15,20 +15,12 @@ public class Source {
         this.doc = doc;
     }
 
-    public Elements select(String cssQuery) {
-        return doc.select(cssQuery);
-    }
-
-    public String title() {
-        return doc.title();
+    public boolean checkAccessDenied() {
+        return has("div[class=m5 cntr amount]:contains(Данная страница недоступна)");
     }
 
     public boolean checkPageError() {
         return has("div[class=m5 cntr amount]:contains(Произошла какая-то ошибка)");
-    }
-
-    public boolean checkAccessDenied() {
-        return has("div[class=m5 cntr amount]:contains(Данная страница недоступна)");
     }
 
     public boolean has(String cssQuery) {
@@ -45,6 +37,14 @@ public class Source {
 
     public boolean hasLink(String hrefContains) {
         return getLink(hrefContains) != null;
+    }
+
+    public Elements select(String cssQuery) {
+        return doc.select(cssQuery);
+    }
+
+    public String title() {
+        return doc.title();
     }
 
     public Element getLink(String hrefContains) {

@@ -29,7 +29,7 @@ public class SkyscrapersSearch {
     }
 
     public SearchOnlineRequest online() {
-        return new SearchOnlineRequest(null);
+        return new SearchOnlineRequest();
     }
 
     public SearchOnlineRequest onlinePagination(PaginationItem paginationItem) {

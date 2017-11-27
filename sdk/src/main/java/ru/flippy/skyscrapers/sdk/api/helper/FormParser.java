@@ -1,7 +1,6 @@
 package ru.flippy.skyscrapers.sdk.api.helper;
 
 import android.support.annotation.CheckResult;
-import android.util.Log;
 
 import org.jsoup.Connection;
 import org.jsoup.nodes.Element;
@@ -9,7 +8,6 @@ import org.jsoup.nodes.FormElement;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 public class FormParser {
 

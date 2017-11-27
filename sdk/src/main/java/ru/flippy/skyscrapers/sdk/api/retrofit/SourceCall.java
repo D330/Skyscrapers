@@ -6,7 +6,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.flippy.skyscrapers.sdk.api.helper.Source;
-import ru.flippy.skyscrapers.sdk.listener.Errorable;
+import ru.flippy.skyscrapers.sdk.listener.ErrorListener;
 import ru.flippy.skyscrapers.sdk.listener.SourceCallback;
 import ru.flippy.skyscrapers.sdk.listener.SourceTagCallback;
 
@@ -15,7 +15,7 @@ import static ru.flippy.skyscrapers.sdk.api.Error.NETWORK;
 public class SourceCall {
 
     private Call<Source> call;
-    private Errorable errorable;
+    private ErrorListener errorListener;
     private Object tag;
 
     SourceCall(Call<Source> call) {
@@ -27,8 +27,8 @@ public class SourceCall {
         return this;
     }
 
-    public SourceCall error(Errorable errorable) {
-        this.errorable = errorable;
+    public SourceCall error(ErrorListener errorListener) {
+        this.errorListener = errorListener;
         return this;
     }
 
@@ -47,7 +47,6 @@ public class SourceCall {
             @Override
             public void onFailure(Call<Source> call, Throwable t) {
                 handleError(NETWORK);
-                Log.d("Q", "q", t);
             }
         });
     }
@@ -72,8 +71,8 @@ public class SourceCall {
     }
 
     private void handleError(int errorCode) {
-        if (errorable != null) {
-            errorable.onError(errorCode);
+        if (errorListener != null) {
+            errorListener.onError(errorCode);
         }
     }
 }

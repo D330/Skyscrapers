@@ -9,7 +9,6 @@ import java.util.List;
 
 import ru.flippy.skyscrapers.sdk.api.Error;
 import ru.flippy.skyscrapers.sdk.api.SkyscrapersApi;
-import ru.flippy.skyscrapers.sdk.api.helper.FixedSizeList;
 import ru.flippy.skyscrapers.sdk.api.helper.Source;
 import ru.flippy.skyscrapers.sdk.api.model.Dialog;
 import ru.flippy.skyscrapers.sdk.api.model.MiniMessage;
@@ -20,10 +19,10 @@ import ru.flippy.skyscrapers.sdk.util.Utils;
 
 public class MailDialogsRequest {
 
-    private FixedSizeList<Source> pages;
+    private List<Source> pages;
     private LinkedHashMap<Long, MiniMessage> messages;
     private List<Long> interlocutorIds;
-    private FixedSizeList<Dialog> dialogs;
+    private List<Dialog> dialogs;
 
     public void execute(final RequestListener<List<Dialog>> listener) {
         RetrofitClient.getApi().mail()
@@ -34,14 +33,14 @@ public class MailDialogsRequest {
                         listener.onResponse(new ArrayList<>());
                     } else {
                         int pageCount = mailDoc.pagination().getPageCount();
-                        pages = new FixedSizeList<>(pageCount);
+                        pages = new ArrayList<>();
                         for (int pageNumber = 0; pageNumber < pageCount; pageNumber++) {
                             RetrofitClient.getApi().mailPagination(pageNumber)
                                     .setTag(pageCount - pageNumber - 1)
                                     .error(listener)
                                     .success((tag, pageDoc) -> {
                                         pages.set((int) tag, pageDoc);
-                                        if (pages.isFilled()) {
+                                        if (pages.size() == pageCount) {
                                             messages = new LinkedHashMap<>();
                                             for (Source page : pages) {
                                                 Elements messageElements = page.select("div.m5").first().select("div>div:has(span.tdn>span.user)");
@@ -58,7 +57,7 @@ public class MailDialogsRequest {
                                                     messages.put(interlocutorId, message);
                                                 }
                                             }
-                                            dialogs = new FixedSizeList<>(messages.size());
+                                            dialogs = new ArrayList<>();
                                             interlocutorIds = new ArrayList<>(messages.keySet());
                                             for (Long interlocutorId : interlocutorIds) {
                                                 SkyscrapersApi.getProfile(interlocutorId).execute(new RequestListener<Profile>() {
@@ -71,7 +70,7 @@ public class MailDialogsRequest {
                                                         dialog.setLastMessage(lastMessage);
                                                         dialog.setInterlocutor(profile);
                                                         dialogs.set(interlocutorIds.indexOf(profileId), dialog);
-                                                        if (dialogs.isFilled()) {
+                                                        if (dialogs.size() == messages.size()) {
                                                             listener.onResponse(dialogs);
                                                         }
                                                     }

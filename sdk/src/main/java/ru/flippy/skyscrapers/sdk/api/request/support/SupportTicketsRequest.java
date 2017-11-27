@@ -16,6 +16,10 @@ public class SupportTicketsRequest {
 
     private PaginationItem paginationItem;
 
+    public SupportTicketsRequest() {
+
+    }
+
     public SupportTicketsRequest(PaginationItem paginationItem) {
         this.paginationItem = paginationItem;
     }

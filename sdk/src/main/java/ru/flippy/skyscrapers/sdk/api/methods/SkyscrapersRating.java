@@ -6,19 +6,19 @@ import ru.flippy.skyscrapers.sdk.api.request.rating.RatingUsersRequest;
 
 public class SkyscrapersRating {
 
-    public RatingUsersRequest getUsers(int type) {
-        return new RatingUsersRequest(type, null);
+    public RatingUsersRequest users(int type) {
+        return new RatingUsersRequest(type);
     }
 
-    public RatingUsersRequest getUsers(int type, PaginationItem paginationItem) {
+    public RatingUsersRequest users(int type, PaginationItem paginationItem) {
         return new RatingUsersRequest(type, paginationItem);
     }
 
-    public RatingCityRequest getCity() {
-        return new RatingCityRequest(null);
+    public RatingCityRequest cities() {
+        return new RatingCityRequest();
     }
 
-    public RatingCityRequest getCity(PaginationItem paginationItem) {
+    public RatingCityRequest cities(PaginationItem paginationItem) {
         return new RatingCityRequest(paginationItem);
     }
 

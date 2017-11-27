@@ -1,5 +1,5 @@
 package ru.flippy.skyscrapers.sdk.listener;
 
-public interface Errorable {
+public interface ErrorListener {
     void onError(int errorCode);
 }
