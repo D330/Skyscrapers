@@ -23,21 +23,21 @@ android {
     }
 }
 
-dependencies {
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'org.jsoup:jsoup:1.10.3'
-    compile('com.mikepenz:materialdrawer:5.9.5@aar') { transitive = true; }
-    compile 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+ext {
+    supportLibraryVersion = '27.0.1'
+    butterKnifeVersion = '8.8.1'
+    materialDrawerVersion = '6.0.2'
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        def requested = details.requested
-        if (requested.group == 'com.android.support') {
-            if (!requested.name.startsWith("multidex")) {
-                details.useVersion '25.3.1'
-            }
-        }
-    }
+dependencies {
+    implementation project(':sdk')
+
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    implementation "com.android.support:support-annotations:$supportLibraryVersion"
+    implementation "com.android.support:design:$supportLibraryVersion"
+    implementation "com.jakewharton:butterknife:$butterKnifeVersion"
+    implementation("com.mikepenz:materialdrawer:$materialDrawerVersion@aar") { transitive = true }
+
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
 }
